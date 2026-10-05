@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --canvas-base: #0a0b0e;
+    --surface-primary: #12141a;
+    --surface-elevated: #1a1d26;
+    --surface-subtle: #141720;
+    --surface-lowest: #0c0e14;
+    --surface-low: #191b22;
+    --surface-container: #1d1f26;
+    --surface-high: #242730;
+    --surface-variant: #2e323d;
+
+    /* Competitive, disciplined, non-glaring accent color */
+    --primary-accent: #95cc1a;
+    --primary-container: #88c425;
+    --on-primary: #0a0b0e;
+
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+
+    --border-subtle: #1e222b;
+    --border-strong: #262a36;
+    --border-active: #88c425;
+
+    --status-live: #e11d48;
+    --status-win: #10b981;
+    --status-loss: #64748b;
+
+    --font-display: 'Barlow Condensed', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    background-color: var(--canvas-base);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--canvas-base);
+    color: #e2e8f0;
+    font-family: 'Hanken Grotesk', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background: #88c425;
+    color: #0a0b0e;
+  }
+}
+
+/* Custom Minimal Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #0c0e14;
+}
+::-webkit-scrollbar-thumb {
+  background: #262a36;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #88c425;
+}
+
+/* Typography Utility Classes */
+.font-display-hero {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 72px;
+  line-height: 72px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.font-display-hero-mobile {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 40px;
+  line-height: 40px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.font-headline-xl {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 48px;
+  line-height: 50px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+}
+
+.font-headline-lg {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 32px;
+  line-height: 36px;
+  font-weight: 700;
+  letter-spacing: 0em;
+  text-transform: uppercase;
+}
+
+.font-headline-md {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 24px;
+  line-height: 28px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.font-headline-sm {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.font-body-lg {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 17px;
+  line-height: 26px;
+  font-weight: 400;
+}
+
+.font-body-md {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+}
+
+.font-body-sm {
+  font-family: 'Hanken Grotesk', sans-serif;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+}
+
+.font-label-mono-lg {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+}
+
+.font-label-mono-sm {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.font-label-caps {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px;
+  line-height: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Tactical grid background pattern */
+.tactical-grid-bg {
+  background-image: linear-gradient(to right, rgba(38, 42, 54, 0.15) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(38, 42, 54, 0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+}

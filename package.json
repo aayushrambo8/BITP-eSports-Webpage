@@ -1,0 +1,40 @@
+{
+  "name": "bitp-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev src/frontend",
+    "build": "next build src/frontend",
+    "start": "next start src/frontend",
+    "lint": "eslint src/frontend/app src/frontend/components src/frontend/context src/frontend/data src/backend",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate --schema src/backend/prisma/schema.prisma",
+    "db:push": "prisma db push --schema src/backend/prisma/schema.prisma",
+    "admin:create": "node --env-file=.env --import tsx src/backend/scripts/create-admin.ts"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "bcryptjs": "^3.0.3",
+    "jose": "^6.2.12",
+    "lucide-react": "^1.52.0",
+    "next": "16.3.8",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.3.8",
+    "prisma": "5.22.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  }
+}
