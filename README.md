@@ -34,8 +34,8 @@ The Next.js app includes the backend API routes, so deploy the whole application
 
 ### 1. Copy the Prisma Postgres connection strings
 
-1. Sign in to [Prisma Console](https://console.prisma.io/) and open the workspace/project containing your `claret-tree` Prisma Postgres database.
-2. Select the `claret-tree` database.
+1. Sign in to [Prisma Console](https://console.prisma.io/) and open the workspace/project containing your `bitpesports-prisma-vercel` Prisma Postgres database.
+2. Select the `bitpesports-prisma-vercel` database.
 3. Find the connection string for the database. If you are using the Vercel integration, it may already have set `DATABASE_URL` in the Vercel project.
 4. Set the PostgreSQL connection string as `DATABASE_URL` locally and in Vercel. Treat it as a password: do not paste it in chat, commit it, or put it in frontend code.
 
