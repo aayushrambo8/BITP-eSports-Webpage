@@ -11,22 +11,80 @@ npm ci
 cp .env.example .env
 ```
 
-Set `DATABASE_URL` to a Prisma Postgres connection string and set a unique `ADMIN_JWT_SECRET` in `.env` (for example, generate one with `openssl rand -base64 48`). Keep `.env` private; it is ignored by Git. Then initialize the database schema and create an admin account:
+Follow the production setup below to get the Prisma Postgres connection string and put it in `DATABASE_URL` in `.env`. Keep `.env` private; it is ignored by Git.
 
 ```bash
 npm run db:generate
 npm run db:push
 ```
 
-Put `ADMIN_EMAIL`, `ADMIN_NAME`, and `ADMIN_PASSWORD` in `.env` temporarily, then run:
+Set `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD` (14–72 UTF-8 bytes), and `ADMIN_ROLE=OWNER` in `.env` temporarily, then run:
 
 ```bash
 npm run admin:create
 ```
 
-Use a unique password of at least 14 characters and set `ADMIN_ROLE=OWNER` for the first account. Remove `ADMIN_PASSWORD` from `.env` after provisioning. To promote an existing account through the trusted CLI, use its email and set `ADMIN_ROLE=OWNER`; this invalidates its existing sessions.
+Remove `ADMIN_PASSWORD` from `.env` after provisioning. To promote an existing account through the trusted CLI, use its email and set `ADMIN_ROLE=OWNER`; this invalidates its existing sessions.
 
 Start the site with `npm run dev`, then sign in at [http://localhost:3000/admin](http://localhost:3000/admin).
+
+## Production setup (Vercel + Prisma Postgres)
+
+The Next.js app includes the backend API routes, so deploy the whole application to Vercel. No separate Render service is needed for the current architecture.
+
+### 1. Copy the Prisma Postgres connection strings
+
+1. Sign in to [Prisma Console](https://console.prisma.io/) and open the workspace/project containing your `claret-tree` Prisma Postgres database.
+2. Select the `claret-tree` database.
+3. Find the connection string for the database. If you are using the Vercel integration, it may already have set `DATABASE_URL` in the Vercel project.
+4. Set the PostgreSQL connection string as `DATABASE_URL` locally and in Vercel. Treat it as a password: do not paste it in chat, commit it, or put it in frontend code.
+
+### 2. Create the database tables and initial Owner account
+
+On your development computer, put the connection string in the ignored root `.env`:
+
+```dotenv
+DATABASE_URL="paste-the-connection-string-here"
+```
+
+From the repository root, create the tables:
+
+```bash
+npm ci
+npm run db:generate
+npm run db:push
+```
+
+Then temporarily add `ADMIN_EMAIL`, `ADMIN_NAME`, `ADMIN_PASSWORD`, and `ADMIN_ROLE=OWNER` to `.env` and run `npm run admin:create`. Use a unique password of at least 14 characters and no more than 72 UTF-8 bytes. Remove `ADMIN_PASSWORD` when the account is created. The initial database has no content records; add them after signing in at `/admin`.
+
+### 3. Add server environment variables in Vercel
+
+1. Open [Vercel Dashboard](https://vercel.com/dashboard) → select the BITPeSports project → **Settings** → **Environment Variables**.
+2. Add each variable to the **Production** environment (also add it to **Preview** only if preview deployments should use the production database; preferably use a separate preview database).
+3. Add:
+
+| Name | Value |
+| --- | --- |
+| `DATABASE_URL` | Prisma Postgres connection string |
+| `ADMIN_JWT_SECRET` | Unique random secret, at least 32 characters. Generate locally with `openssl rand -base64 48`. |
+| `APP_BASE_URL` | The deployed HTTPS origin, e.g. `https://your-project.vercel.app` (no trailing path). |
+| `RESEND_API_KEY` | Resend API key; required for invitations and password resets. |
+| `AUTH_FROM_EMAIL` | Sender using your verified domain, e.g. `BITPeSports <accounts@your-domain.example>`. |
+
+The Prisma database connection strings and `ADMIN_JWT_SECRET` must remain server-only. Never prefix them with `NEXT_PUBLIC_`.
+
+### 4. Configure Resend email
+
+1. In the [Resend Dashboard](https://resend.com/), open **Domains** → **Add Domain** and add a domain or subdomain you control.
+2. Add the DNS records Resend provides at your domain registrar/DNS host, then wait until the domain shows as verified.
+3. Open **API Keys** → **Create API Key**. Copy it once and add it to Vercel as `RESEND_API_KEY`.
+4. Set `AUTH_FROM_EMAIL` to an address on that verified domain. Account invitations and password resets use it.
+
+For contact-form email notifications, also add `CONTACT_FROM_EMAIL` (verified sender) and `CONTACT_TO_EMAIL` (club inbox) in Vercel. Contact submissions are stored in the database even if notification email is not configured.
+
+### 5. Deploy and sign in
+
+Save Vercel variables, then open **Deployments** and redeploy the latest successful Git commit (or push the setup changes to the connected GitHub branch). Once deployment succeeds, visit `https://your-domain/admin` and sign in using the initial Owner email and password. Use the **User accounts** tab to invite other people and assign privileges; do not create accounts by sharing the Owner password.
 
 ## Content manager
 
