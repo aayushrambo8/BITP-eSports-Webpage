@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEsportsModal } from '@/context/ModalContext';
 import { 
-  CLUB_PILLARS, ABOUT_PAGE_ASSETS, CONTACT_INFO, type ClubOfficer,
+  CLUB_PILLARS, ABOUT_PAGE_ASSETS, CONTACT_INFO, CLUB_OFFICER_PHOTOS, type ClubOfficer,
   localResourceImage,
 } from '@/data/esportsData';
 import { 
@@ -13,6 +13,13 @@ import {
 } from 'lucide-react';
 
 const carouselOffsets = [-1, 0, 1, 2] as const;
+
+function officerPhoto(officer: ClubOfficer) {
+  const key = officer.name.trim().toLocaleLowerCase('en');
+  return CLUB_OFFICER_PHOTOS[key]
+    ?? officer.photoUrl
+    ?? localResourceImage(officer.imageUrl, '/resources/people/default-avatar.svg');
+}
 
 function OfficerCarousel({ title, officers }: { title: string; officers: ClubOfficer[] }) {
   const [index, setIndex] = useState(0);
@@ -55,7 +62,7 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
           No {title.toLowerCase()} profiles have been added yet.
         </p>
       ) : (
-        <div className="relative h-[25rem] overflow-hidden sm:h-[31rem] lg:h-auto lg:aspect-[16/7]" aria-roledescription="carousel">
+        <div className="relative mx-auto h-[25rem] max-w-4xl overflow-hidden sm:h-[29rem] lg:h-auto lg:aspect-[16/7]" aria-roledescription="carousel">
           {carouselOffsets.map((offset) => {
             const officerIndex = (index + offset + sortedOfficers.length) % sortedOfficers.length;
             const officer = sortedOfficers[officerIndex];
@@ -63,12 +70,12 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
               <article
                 key={`${offset}-${officer.id}`}
                 aria-hidden={offset === -1 || offset === 2}
-                className="absolute top-0 w-[37.5%] border border-[#33343b] bg-[#191b22]"
-                style={{ left: `${12.5 + offset * 37.5}%` }}
+                className="absolute top-0 w-[32%] border border-[#33343b] bg-[#191b22]"
+                style={{ left: `${17 + offset * 34}%` }}
               >
                 <div className="relative aspect-[16/15] overflow-hidden bg-[#111319]">
                   <Image
-                    src={officer.photoUrl ?? localResourceImage(officer.imageUrl, '/resources/people/default-avatar.svg')}
+                    src={officerPhoto(officer)}
                     alt={officer.name}
                     fill
                     sizes="(max-width: 768px) 38vw, 450px"

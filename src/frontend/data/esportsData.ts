@@ -79,6 +79,18 @@ export interface ClubOfficer {
   photoUrl?: string | null;
 }
 
+export const CLUB_OFFICER_PHOTOS: Record<string, string> = {
+  'aayush arya': '/resources/people/aayush-arya-senior-coordinator.webp',
+  'aayush babu': '/resources/people/aayush-babu-senior-coordinator.webp',
+  'akshay kumar keshav': '/resources/people/akshay-kumar-keshav-junior-coordinator.webp',
+  'aryan nirala': '/resources/people/aryan-nirala-junior-coordinator.webp',
+  'daksha chandra': '/resources/people/daksha-chandra-junior-coordinator.webp',
+  hridayesh: '/resources/people/hridayesh-junior-coordinator.webp',
+  'kshitij tiwari': '/resources/people/kshitij-tiwari-senior-coordinator.webp',
+  'kumar tanishq': '/resources/people/kumar-tanishq-junior-coordinator.webp',
+  'suryansh garg': '/resources/people/suryansh-garg-junior-coordinator.webp',
+};
+
 export interface ClubTeamMember {
   id: string;
   name: string;

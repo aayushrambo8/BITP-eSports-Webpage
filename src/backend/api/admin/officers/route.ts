@@ -5,8 +5,6 @@ import {
   ApiInputError,
   inputErrorResponse,
   optionalInteger,
-  optionalText,
-  optionalUrl,
   readJsonObject,
   requiredText,
   requireAdmin,
@@ -39,6 +37,13 @@ export async function GET(request: Request) {
 
 function officerData(body: Record<string, unknown>, partial = false) {
   const data: Record<string, unknown> = {};
+  if (!partial) {
+    data.handle = "";
+    data.yearMajor = "";
+    data.tag = "";
+    data.discord = "";
+    data.imageUrl = "";
+  }
   for (const [field, maxLength] of [["name", 120], ["rollNo", 40]] as const) {
     if (body[field] !== undefined || !partial) data[field] = requiredText(body[field], field, maxLength);
   }
@@ -49,15 +54,6 @@ function officerData(body: Record<string, unknown>, partial = false) {
     }
     data.role = role;
   }
-  for (const [field, maxLength] of [
-    ["handle", 80],
-    ["yearMajor", 120],
-    ["tag", 40],
-    ["discord", 100],
-  ] as const) {
-    if (body[field] !== undefined || !partial) data[field] = optionalText(body[field], field, maxLength) ?? "";
-  }
-  if (body.imageUrl !== undefined || !partial) data.imageUrl = optionalUrl(body.imageUrl, "Image URL") ?? "";
   if (body.order !== undefined || !partial) data.order = optionalInteger(body.order, "Display order", 0, 0, 10_000);
   return data;
 }
