@@ -61,6 +61,7 @@ export interface TournamentEvent {
   formatSub: string;
   statusBadge: string;
   description?: string;
+  posterUrl?: string | null;
   slotsFilled?: number;
   slotsTotal?: number;
 }

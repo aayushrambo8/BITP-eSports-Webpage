@@ -76,10 +76,20 @@ model Event {
   slotsFilled Int?     @default(0)
   slotsTotal  Int?     @default(64)
   isSpotlight Boolean  @default(false)
+  poster      EventPoster?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@index([isoDate])
+}
+
+model EventPoster {
+  id        String   @id @default(uuid())
+  eventId   String   @unique
+  data      Bytes
+  mimeType  String
+  updatedAt DateTime @updatedAt
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }
 
 model Match {

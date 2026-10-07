@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEsportsModal } from '@/context/ModalContext';
 import { type TournamentEvent } from '@/data/esportsData';
@@ -98,6 +99,16 @@ export default function EventsPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-0">
               {/* Left Visual Highlight */}
               <div className="lg:col-span-5 relative min-h-[300px] border-b lg:border-b-0 lg:border-r border-[#33343b] bg-[#0c0e14] flex flex-col justify-between p-6 sm:p-8">
+                {nearestEvent.posterUrl && (
+                  <Image
+                    src={nearestEvent.posterUrl}
+                    alt={`${nearestEvent.title} event poster`}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 42vw"
+                    unoptimized
+                    className="object-cover opacity-35"
+                  />
+                )}
                 <div className="relative z-10">
                   <span className="inline-block border border-[#cdf200] text-[#cdf200] px-2 py-0.5 font-label-mono-sm uppercase text-xs mb-3">
                     {nearestEvent.discipline}
@@ -130,7 +141,7 @@ export default function EventsPage() {
                     {nearestEvent.title}
                   </h2>
 
-                  <p className="font-body-md text-[#8f96a3] leading-relaxed mb-6">
+                  <p className="font-body-md whitespace-pre-wrap text-[#8f96a3] leading-relaxed mb-6">
                     {nearestEvent.description || 'Official campus tournament gathering. Registered teams and solo contenders must report to check-in on time.'}
                   </p>
 
@@ -224,6 +235,18 @@ export default function EventsPage() {
                 key={item.id}
                 className="border border-[#33343b] bg-[#191b22] hover:border-[#cdf200] transition-colors p-6 flex flex-col justify-between space-y-4"
               >
+                {item.posterUrl && (
+                  <div className="relative aspect-[1440/1350] w-full overflow-hidden border border-[#33343b]">
+                    <Image
+                      src={item.posterUrl}
+                      alt={`${item.title} event poster`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      unoptimized
+                      className="object-cover"
+                    />
+                  </div>
+                )}
                 <div className="space-y-3">
                   <div className="flex items-center justify-between border-b border-[#33343b] pb-2 font-label-mono-sm text-xs">
                     <span className="text-[#cdf200] font-bold">{item.discipline}</span>
@@ -245,7 +268,7 @@ export default function EventsPage() {
                     </div>
                   </div>
 
-                  <p className="font-body-sm text-[#8f96a3] line-clamp-2">
+                  <p className="font-body-sm whitespace-pre-wrap text-[#8f96a3]">
                     {item.description || item.format}
                   </p>
                 </div>

@@ -23,7 +23,18 @@ export async function GET(request: Request) {
       orderBy: { isoDate: "asc" },
       take: 200,
     });
-    return NextResponse.json({ success: true, events });
+    const posters = await prisma.eventPoster.findMany({
+      where: { eventId: { in: events.map((event) => event.id) } },
+      select: { eventId: true },
+    });
+    const posterIds = new Set(posters.map((poster) => poster.eventId));
+    return NextResponse.json({
+      success: true,
+      events: events.map((event) => ({
+        ...event,
+        posterUrl: posterIds.has(event.id) ? `/api/events/${event.id}/poster` : null,
+      })),
+    });
   } catch (error) {
     return safeServerError("Admin event listing failed:", error);
   }
@@ -78,7 +89,7 @@ function eventData(body: Record<string, unknown>, partial = false) {
     data.isoDate = requiredDate(body.isoDate, "Event date");
   }
   if (body.description !== undefined || !partial) {
-    data.description = optionalText(body.description, "Description", 4_000);
+    data.description = optionalText(body.description, "Description", 4_000)?.replace(/\r\n?/g, "\n") ?? null;
   }
   if (body.slotsFilled !== undefined || !partial) {
     data.slotsFilled = optionalInteger(body.slotsFilled, "Filled slots", 0, 0, 100_000);

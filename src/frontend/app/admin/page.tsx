@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
 
 type ResourceKey = 'events' | 'matches' | 'sessions' | 'results' | 'games' | 'members' | 'officers' | 'achievements' | 'contact';
 type SectionKey = ResourceKey | 'users' | 'account' | 'activity';
@@ -212,9 +213,14 @@ export default function AdminPage() {
   const [profileName, setProfileName] = useState('');
   const [profileUsername, setProfileUsername] = useState('');
   const [activity, setActivity] = useState<AdminActivity[]>([]);
+  const [eventPosterFile, setEventPosterFile] = useState<File | null>(null);
 
   const resource = resources[active === 'users' || active === 'account' || active === 'activity' ? 'events' : active];
   const endpoint = resource.endpoint;
+  const existingEventPosterValue = active === 'events' && editingId
+    ? entries.find((entry) => entry.id === editingId)?.posterUrl
+    : null;
+  const existingEventPoster = typeof existingEventPosterValue === 'string' ? existingEventPosterValue : null;
 
   const loadEntries = useCallback(async () => {
     const response = await fetch(endpoint, { cache: 'no-store' });
@@ -473,6 +479,7 @@ export default function AdminPage() {
       else values[field.name] = value == null ? '' : String(value);
     }
     setEditingId(typeof entry.id === 'string' ? entry.id : null);
+    setEventPosterFile(null);
     setForm(values);
     setNotice('');
     setError('');
@@ -502,12 +509,46 @@ export default function AdminPage() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not save this item.');
 
+      const savedEventId = active === 'events' ? String(data.event?.id ?? editingId ?? '') : '';
+      if (active === 'events' && eventPosterFile) {
+        if (!savedEventId) throw new Error('Event saved, but its ID was not returned; the poster was not uploaded.');
+        const posterForm = new FormData();
+        posterForm.set('eventId', savedEventId);
+        posterForm.set('poster', eventPosterFile);
+        const posterResponse = await fetch('/api/admin/events/poster', { method: 'POST', body: posterForm });
+        const posterData = await posterResponse.json();
+        if (!posterResponse.ok) {
+          setEditingId(savedEventId);
+          throw new Error(`Event saved, but its poster could not be uploaded: ${posterData.error || 'Please try again.'}`);
+        }
+      }
+
       setForm(emptyForm(resource));
       setEditingId(null);
+      setEventPosterFile(null);
       setNotice(editingId ? 'Changes saved.' : 'Item added.');
       await loadEntries();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : 'Could not save this item.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function removeEventPoster() {
+    if (!editingId || !window.confirm('Remove this event poster?')) return;
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch(`/api/admin/events/poster?eventId=${encodeURIComponent(editingId)}`, { method: 'DELETE' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not remove this poster.');
+      setEventPosterFile(null);
+      setNotice('Event poster removed.');
+      await loadEntries();
+    } catch (removeError) {
+      setError(removeError instanceof Error ? removeError.message : 'Could not remove this poster.');
     } finally {
       setBusy(false);
     }
@@ -746,11 +787,53 @@ export default function AdminPage() {
                   )}
                 </label>
               ))}
+              {active === 'events' && (
+                <div className="space-y-2 sm:col-span-2">
+                  <label className="block space-y-1 text-xs uppercase tracking-wide text-[#8f96a3]">
+                    Event poster (recommended 1440 × 1350 px)
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0] ?? null;
+                        if (file && file.size > 4 * 1024 * 1024) {
+                          setError('Poster images must be no larger than 4 MB.');
+                          event.target.value = '';
+                          setEventPosterFile(null);
+                          return;
+                        }
+                        setError('');
+                        setEventPosterFile(file);
+                      }}
+                      className="block w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white file:mr-3 file:border-0 file:bg-[#cdf200] file:px-3 file:py-1 file:font-bold file:text-[#0a0b0e]"
+                    />
+                    <span className="block normal-case">JPEG, PNG, or WebP. Maximum file size: 4 MB. The display uses a 1440:1350 aspect ratio.</span>
+                  </label>
+                  {existingEventPoster && (
+                    <div className="flex flex-wrap items-end gap-3">
+                      <Image
+                        src={String(existingEventPoster)}
+                        alt="Event poster preview"
+                        width={288}
+                        height={270}
+                        unoptimized
+                        className="h-auto w-36 border border-[#33343b] object-cover"
+                      />
+                      {editingId && existingEventPoster && !eventPosterFile && (
+                        <button type="button" onClick={() => void removeEventPoster()} disabled={busy} className="border border-red-900 px-3 py-2 text-xs uppercase text-red-200 hover:bg-red-950/40 disabled:opacity-50">
+                          Remove poster
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {eventPosterFile && <p className="text-sm text-[#cdf200]">Selected replacement poster: {eventPosterFile.name}</p>}
+                </div>
+              )}
               <div className="flex gap-2 sm:col-span-2">
                 <button disabled={busy} className="bg-[#cdf200] px-4 py-2 font-label-caps text-xs font-bold uppercase text-[#0a0b0e] disabled:opacity-50">
                   {busy ? 'Saving…' : editingId ? 'Save changes' : 'Add item'}
                 </button>
-                {editingId && <button type="button" onClick={() => { setEditingId(null); setForm(emptyForm(resource)); }} className="border border-[#33343b] px-4 py-2 text-xs uppercase text-white">Cancel</button>}
+                {editingId && <button type="button" onClick={() => { setEditingId(null); setEventPosterFile(null); setForm(emptyForm(resource)); }} className="border border-[#33343b] px-4 py-2 text-xs uppercase text-white">Cancel</button>}
               </div>
             </form>
           </section>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEsportsModal } from '@/context/ModalContext';
 import { 
@@ -151,7 +152,7 @@ export default function Home() {
         </div>
 
         {nearestEvent ? (
-          <div className="border border-[#262a36] bg-[#12141a] p-6 sm:p-8 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          <div className={`border border-[#262a36] bg-[#12141a] p-6 sm:p-8 md:p-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center ${nearestEvent.posterUrl ? 'lg:grid-cols-12' : ''}`}>
             <div className="lg:col-span-8 space-y-4">
               <div className="flex items-center gap-2">
                 <span className="bg-[#88c425] text-[#0a0b0e] font-label-mono-sm px-2 py-0.5 font-bold uppercase text-xs">
@@ -164,6 +165,11 @@ export default function Home() {
               <h3 className="font-headline-xl text-white uppercase tracking-tight">
                 {nearestEvent.title}
               </h3>
+              {nearestEvent.description && (
+                <p className="whitespace-pre-wrap font-body-md leading-relaxed text-[#94a3b8]">
+                  {nearestEvent.description}
+                </p>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4 border-t border-b border-[#262a36]">
                 <div>
                   <div className="font-label-mono-sm text-[#94a3b8] uppercase text-xs">Date & Time</div>
@@ -188,6 +194,18 @@ export default function Home() {
                 </Link>
               </div>
             </div>
+            {nearestEvent.posterUrl && (
+              <div className="relative mx-auto aspect-[1440/1350] w-full max-w-md overflow-hidden border border-[#262a36] lg:col-span-4">
+                <Image
+                  src={nearestEvent.posterUrl}
+                  alt={`${nearestEvent.title} event poster`}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 33vw"
+                  unoptimized
+                  className="object-cover"
+                />
+              </div>
+            )}
           </div>
         ) : (
           <div className="border border-[#262a36] bg-[#12141a] p-8 text-center space-y-3">
@@ -233,9 +251,12 @@ export default function Home() {
             >
               {/* Top Banner Image with Gradient Overlay */}
               <div className="relative h-48 bg-[#0c0e14] overflow-hidden">
-                <img
+                <Image
                   src={LOCAL_GAME_ART[game.id] ?? localResourceImage(game.gameArt, '/resources/games/default.svg')}
                   alt={game.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  unoptimized
                   className="w-full h-full object-cover grayscale contrast-125 opacity-40 group-hover:scale-105 group-hover:opacity-60 transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#12141a] via-[#12141a]/60 to-transparent"></div>
