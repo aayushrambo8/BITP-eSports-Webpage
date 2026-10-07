@@ -62,7 +62,7 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
           No {title.toLowerCase()} profiles have been added yet.
         </p>
       ) : (
-        <div className="relative mx-auto h-[25rem] max-w-4xl overflow-hidden sm:h-[29rem] lg:h-auto lg:aspect-[16/7]" aria-roledescription="carousel">
+        <div className="relative mx-auto h-[25rem] max-w-4xl overflow-hidden sm:h-[29rem] lg:h-[32rem]" aria-roledescription="carousel">
           {carouselOffsets.map((offset) => {
             const officerIndex = (index + offset + sortedOfficers.length) % sortedOfficers.length;
             const officer = sortedOfficers[officerIndex];
@@ -73,7 +73,7 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
                 className="absolute top-0 w-[32%] border border-[#33343b] bg-[#191b22]"
                 style={{ left: `${17 + offset * 34}%` }}
               >
-                <div className="relative aspect-[16/15] overflow-hidden bg-[#111319]">
+                <div className="relative aspect-[4/5] overflow-hidden bg-[#111319]">
                   <Image
                     src={officerPhoto(officer)}
                     alt={officer.name}
