@@ -44,8 +44,14 @@ function officerData(body: Record<string, unknown>, partial = false) {
     data.discord = "";
     data.imageUrl = "";
   }
-  for (const [field, maxLength] of [["name", 120], ["rollNo", 40]] as const) {
-    if (body[field] !== undefined || !partial) data[field] = requiredText(body[field], field, maxLength);
+  if (body.name !== undefined || !partial) data.name = requiredText(body.name, "name", 120);
+  if (body.rollNo !== undefined || !partial) {
+    const rollNo = requiredText(body.rollNo, "Roll number", 40);
+    const parts = rollNo.split("/").map((part) => part.trim());
+    if (parts.length !== 3 || !/^[A-Za-z]+$/.test(parts[0]) || !/^\d{1,12}$/.test(parts[1]) || !/^\d{2,4}$/.test(parts[2])) {
+      throw new ApiInputError("Roll number must use Department/Unique number/Enrollment year (for example, BTECH/15272/25).");
+    }
+    data.rollNo = `${parts[0].toUpperCase()}/${parts[1]}/${parts[2]}`;
   }
   if (body.role !== undefined || !partial) {
     const role = requiredText(body.role, "Post", 100);

@@ -36,41 +36,30 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
     <section className="space-y-4">
       <div className="flex items-center justify-between border-b border-[#33343b] pb-3">
         <h3 className="font-headline-md uppercase text-white">{title}</h3>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            aria-label={`Previous ${title.toLowerCase()}`}
-            onClick={() => move(-1)}
-            disabled={sortedOfficers.length < 2}
-            className="border border-[#33343b] bg-[#191b22] p-2 text-white disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </button>
-          <button
-            type="button"
-            aria-label={`Next ${title.toLowerCase()}`}
-            onClick={() => move(1)}
-            disabled={sortedOfficers.length < 2}
-            className="border border-[#33343b] bg-[#191b22] p-2 text-white disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <ChevronRight className="h-5 w-5" />
-          </button>
-        </div>
       </div>
       {sortedOfficers.length === 0 ? (
         <p className="border border-[#33343b] bg-[#0c0e14] p-5 text-sm text-[#8f96a3]">
           No {title.toLowerCase()} profiles have been added yet.
         </p>
       ) : (
-        <div className="relative mx-auto h-[25rem] max-w-4xl overflow-hidden sm:h-[29rem] lg:h-[32rem]" aria-roledescription="carousel">
+        <div className="relative mx-auto h-[27rem] max-w-3xl overflow-hidden sm:h-[29rem] lg:h-[30rem]" aria-roledescription="carousel">
+          <button
+            type="button"
+            aria-label={`Previous ${title.toLowerCase()}`}
+            onClick={() => move(-1)}
+            disabled={sortedOfficers.length < 2}
+            className="absolute left-1 top-1/2 z-10 -translate-y-1/2 border border-[#33343b] bg-[#0c0e14]/95 p-3 text-white disabled:cursor-not-allowed disabled:opacity-40 sm:left-2 sm:p-4"
+          >
+            <ChevronLeft className="h-7 w-7 sm:h-8 sm:w-8" />
+          </button>
           {carouselOffsets.map((offset) => {
             const officerIndex = (index + offset + sortedOfficers.length) % sortedOfficers.length;
             const officer = sortedOfficers[officerIndex];
             return (
               <article
-                key={`${offset}-${officer.id}`}
+                key={`${offset}-${officer.id}-${index}`}
                 aria-hidden={offset === -1 || offset === 2}
-                className="absolute top-0 w-[32%] border border-[#33343b] bg-[#191b22]"
+                className="officer-carousel-enter absolute top-0 w-[32%] border border-[#33343b] bg-[#191b22]"
                 style={{ left: `${17 + offset * 34}%` }}
               >
                 <div className="relative aspect-[4/5] overflow-hidden bg-[#111319]">
@@ -78,7 +67,7 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
                     src={officerPhoto(officer)}
                     alt={officer.name}
                     fill
-                    sizes="(max-width: 768px) 38vw, 450px"
+                    sizes="(max-width: 768px) 38vw, 384px"
                     unoptimized
                     className="object-contain"
                   />
@@ -91,6 +80,15 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
               </article>
             );
           })}
+          <button
+            type="button"
+            aria-label={`Next ${title.toLowerCase()}`}
+            onClick={() => move(1)}
+            disabled={sortedOfficers.length < 2}
+            className="absolute right-1 top-1/2 z-10 -translate-y-1/2 border border-[#33343b] bg-[#0c0e14]/95 p-3 text-white disabled:cursor-not-allowed disabled:opacity-40 sm:right-2 sm:p-4"
+          >
+            <ChevronRight className="h-7 w-7 sm:h-8 sm:w-8" />
+          </button>
         </div>
       )}
     </section>

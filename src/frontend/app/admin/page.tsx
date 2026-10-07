@@ -11,6 +11,9 @@ type Field = {
   type?: 'text' | 'email' | 'url' | 'date' | 'datetime-local' | 'number' | 'textarea' | 'checkbox' | 'select';
   required?: boolean;
   options?: string[];
+  maxLength?: number;
+  pattern?: string;
+  inputMode?: 'text' | 'numeric';
 };
 type Resource = {
   label: string;
@@ -139,7 +142,9 @@ const resources: Record<ResourceKey, Resource> = {
     fields: [
       { name: 'name', label: 'Name', required: true },
       { name: 'role', label: 'Post', type: 'select', options: ['President', 'Senior Coordinator', 'Junior Coordinator'], required: true },
-      { name: 'rollNo', label: 'Roll number', required: true },
+      { name: 'department', label: 'Department (A)', required: true, maxLength: 20, pattern: '[A-Za-z]+' },
+      { name: 'studentNumber', label: 'Unique number (B)', required: true, maxLength: 12, pattern: '[0-9]+', inputMode: 'numeric' },
+      { name: 'enrollmentYear', label: 'Enrollment year (C)', required: true, maxLength: 4, pattern: '[0-9]{2,4}', inputMode: 'numeric' },
       { name: 'order', label: 'Display order', type: 'number' },
     ],
   },
@@ -482,6 +487,12 @@ export default function AdminPage() {
       else if (field.type === 'datetime-local') values[field.name] = displayDateTime(value);
       else values[field.name] = value == null ? '' : String(value);
     }
+    if (active === 'officers' && typeof entry.rollNo === 'string') {
+      const [department = '', studentNumber = '', enrollmentYear = ''] = entry.rollNo.split('/');
+      values.department = department;
+      values.studentNumber = studentNumber;
+      values.enrollmentYear = enrollmentYear;
+    }
     setEditingId(typeof entry.id === 'string' ? entry.id : null);
     setEventPosterFile(null);
     setOfficerPhotoFile(null);
@@ -503,6 +514,15 @@ export default function AdminPage() {
         else if (field.type === 'number') body[field.name] = value === '' ? null : Number(value);
         else if (field.type === 'datetime-local' && value) body[field.name] = new Date(String(value)).toISOString();
         else body[field.name] = value === '' ? null : String(value);
+      }
+      if (active === 'officers') {
+        const department = String(form.department ?? '').trim().toUpperCase();
+        const studentNumber = String(form.studentNumber ?? '').trim();
+        const enrollmentYear = String(form.enrollmentYear ?? '').trim();
+        body.rollNo = `${department}/${studentNumber}/${enrollmentYear}`;
+        delete body.department;
+        delete body.studentNumber;
+        delete body.enrollmentYear;
       }
       if (editingId) body.id = editingId;
 
@@ -824,7 +844,7 @@ export default function AdminPage() {
                   ) : (
                     <>
                       {field.label}
-                      <input required={field.required} type={field.type ?? 'text'} min={field.type === 'number' ? 0 : undefined} value={String(form[field.name] ?? '')} onChange={(event) => setForm({ ...form, [field.name]: event.target.value })} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" />
+                      <input required={field.required} type={field.type ?? 'text'} min={field.type === 'number' ? 0 : undefined} maxLength={field.maxLength} pattern={field.pattern} inputMode={field.inputMode} value={String(form[field.name] ?? '')} onChange={(event) => setForm({ ...form, [field.name]: field.name === 'department' ? event.target.value.toUpperCase() : event.target.value })} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" />
                     </>
                   )}
                 </label>
