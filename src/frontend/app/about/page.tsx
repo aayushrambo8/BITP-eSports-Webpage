@@ -55,7 +55,7 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
           No {title.toLowerCase()} profiles have been added yet.
         </p>
       ) : (
-        <div className="relative h-[25rem] overflow-hidden sm:h-[31rem] lg:h-auto lg:aspect-[8/5]" aria-roledescription="carousel">
+        <div className="relative h-[25rem] overflow-hidden sm:h-[31rem] lg:h-auto lg:aspect-[16/7]" aria-roledescription="carousel">
           {carouselOffsets.map((offset) => {
             const officerIndex = (index + offset + sortedOfficers.length) % sortedOfficers.length;
             const officer = sortedOfficers[officerIndex];
@@ -66,14 +66,14 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
                 className="absolute top-0 w-[37.5%] border border-[#33343b] bg-[#191b22]"
                 style={{ left: `${12.5 + offset * 37.5}%` }}
               >
-                <div className="relative aspect-[4/5] overflow-hidden bg-[#111319]">
+                <div className="relative aspect-[16/15] overflow-hidden bg-[#111319]">
                   <Image
                     src={officer.photoUrl ?? localResourceImage(officer.imageUrl, '/resources/people/default-avatar.svg')}
                     alt={officer.name}
                     fill
                     sizes="(max-width: 768px) 38vw, 450px"
                     unoptimized
-                    className="object-cover"
+                    className="object-contain"
                   />
                 </div>
                 <div className="min-h-24 border-t border-[#33343b] p-3 sm:p-4">
