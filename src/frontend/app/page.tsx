@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEsportsModal } from '@/context/ModalContext';
 import { 
   CONTACT_INFO,
+  DEFAULT_CLUB_GAMES,
   LOCAL_GAME_ART, localResourceImage,
   type ClubGame, type ScheduledMatch, type WeeklyScheduleItem, type RecentResult, type TournamentEvent,
 } from '@/data/esportsData';
@@ -15,7 +16,7 @@ import {
 
 export default function Home() {
   const { openModal } = useEsportsModal();
-  const [games, setGames] = useState<ClubGame[]>([]);
+  const [games, setGames] = useState<ClubGame[]>(DEFAULT_CLUB_GAMES);
   const [matches, setMatches] = useState<ScheduledMatch[]>([]);
   const [sessions, setSessions] = useState<WeeklyScheduleItem[]>([]);
   const [results, setResults] = useState<RecentResult[]>([]);
@@ -27,7 +28,9 @@ export default function Home() {
       const response = await fetch(url, { cache: 'no-store' });
       if (!response.ok) throw new Error(`Unable to load ${key}.`);
       const data = await response.json();
-      if (active && Array.isArray(data[key])) setData(data[key] as T[]);
+      if (active && Array.isArray(data[key]) && (key !== 'games' || data[key].length > 0)) {
+        setData(data[key] as T[]);
+      }
     };
 
     void Promise.all([
