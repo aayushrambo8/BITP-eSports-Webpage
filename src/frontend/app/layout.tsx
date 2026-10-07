@@ -7,9 +7,9 @@ import EsportsModals from "@/components/EsportsModals";
 import Toast from "@/components/Toast";
 
 export const metadata: Metadata = {
-  title: "Apex Esports Club | Campus Gaming & Collegiate Esports",
+  title: "BITPeSports | Campus Gaming & Collegiate Esports",
   description: "Official student-led gaming and esports club. Competitive varsity qualifiers, weekly local meetups, 18 tournament PC rigs in Student Union Room 204.",
-  keywords: ["Apex Esports", "Collegiate Esports", "Campus Gaming", "Student Union", "Valorant", "Rocket League", "Smash Bros", "NACE Starleague", "ECAC"],
+  keywords: ["BITPeSports", "Collegiate Esports", "Campus Gaming", "Student Union", "Valorant", "Rocket League", "Smash Bros", "NACE Starleague", "ECAC"],
 };
 
 export default function RootLayout({

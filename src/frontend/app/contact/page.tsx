@@ -96,7 +96,7 @@ export default function ContactPage() {
           <span className="w-2 h-2 rounded-full bg-[#cdf200] animate-pulse"></span>
         </div>
         <h1 className="font-headline-xl text-white uppercase tracking-tight text-4xl sm:text-5xl">
-          GET IN TOUCH // APEX ESPORTS
+          GET IN TOUCH // <span className="normal-case">BITPeSports</span>
         </h1>
         <p className="font-body-lg text-[#8f96a3] max-w-3xl mt-2 leading-relaxed">
           Reach out for collegiate scrims, team tryouts, or general inquiries. Messages are saved to the club admin inbox, with email notifications when configured.

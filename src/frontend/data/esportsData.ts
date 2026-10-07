@@ -113,31 +113,42 @@ export interface ContactSubmission {
 // ABOUT US CONFIGURABLE ASSETS & IMAGES
 // -------------------------------------------------------------
 export const ABOUT_PAGE_ASSETS = {
-  photo1: 'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
+  photo1: '/resources/about/esports-arena.jpg',
   photo1Caption: 'FIG 01 // COLLEGIATE ESPORTS ARENA',
-  photo2: 'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80',
+  photo2: '/resources/about/broadcast-studio.jpg',
   photo2Caption: 'FIG 02 // LIVESTREAM SHOUTCAST STUDIO',
-  photo3: 'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=800&q=80',
+  photo3: '/resources/about/campus-gaming.jpg',
   photo3Caption: 'FIG 03 // MOBILE & CONSOLE CHAMPIONSHIP',
 };
+
+export const LOCAL_GAME_ART: Record<string, string> = {
+  'ea-fc': '/resources/games/eafc.svg',
+  valorant: '/resources/games/valorant.svg',
+  'free-fire': '/resources/games/free-fire.svg',
+  bgmi: '/resources/games/bgmi.svg',
+};
+
+export function localResourceImage(value: string | null | undefined, fallback: string): string {
+  if (typeof value !== 'string' || !value.startsWith('/resources/') || value.includes('..')) return fallback;
+  return value;
+}
 
 // -------------------------------------------------------------
 // CONTACT TOUCHPOINTS
 // -------------------------------------------------------------
 export const CONTACT_INFO = {
-  instagramHandle: '@ApexEsportsClub',
-  instagramUrl: 'https://instagram.com/apexesportsclub',
-  mail: 'esportsclub@university.edu',
-  scrimsMail: 'scrims.apex@university.edu',
-  discordUrl: 'https://discord.gg/apexesports',
-  officeHours: 'Tuesdays & Thursdays: 4:00 PM – 6:00 PM',
+  instagramHandle: '@BITPeSports',
+  instagramUrl: 'https://www.instagram.com/bitpesports.gg/',
+  mail: 'bitpesports.gg@gmail.com',
+  scrimsMail: 'bitpesports.gg@gmail.com',
+  discordUrl: 'https://discord.gg/rXHBTSDkcf'
 };
 
 export const CLUB_PILLARS = [
   {
     code: '01 // COMP',
     title: 'Competitive Collegiate Teams',
-    description: 'Fielding official teams across EA FC, Valorant, Free Fire, and BGMI in inter-college championships.',
+    description: 'Fielding teams across EA FC, Valorant, Free Fire, and BGMI in intra/inter-college championships.',
     metaLeft: 'VARSITY & ROOKIE',
     metaRight: 'TRYOUTS SEASONAL',
   },

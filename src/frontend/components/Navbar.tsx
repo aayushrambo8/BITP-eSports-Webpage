@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEsportsModal } from '@/context/ModalContext';
 import { Menu, X, User } from 'lucide-react';
@@ -9,7 +10,6 @@ import { CONTACT_INFO } from '@/data/esportsData';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { playTacticalSound } = useEsportsModal();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -26,15 +26,17 @@ export default function Navbar() {
         <div className="flex items-center gap-4">
           <Link
             href="/"
-            onClick={() => playTacticalSound('click')}
             className="font-headline-md tracking-wider uppercase text-[#e2e2ea] font-bold flex items-center gap-2 group hover:text-white transition-colors"
           >
-            <span className="w-3 h-3 bg-[#cdf200] inline-block group-hover:scale-110 transition-transform"></span>
-            <span>APEX ESPORTS</span>
+            <Image
+              src="/resources/brand/BITPeSports-logo.jpg"
+              alt=""
+              width={32}
+              height={32}
+              className="h-8 w-8 object-cover transition-transform group-hover:scale-110"
+            />
+            <span className="normal-case">BITPeSports</span>
           </Link>
-          <span className="hidden xl:inline-block font-label-mono-sm text-[#8f96a3] border border-[#33343b] px-2 py-0.5">
-            EST. 2020 // CAMPUS DIVISION
-          </span>
         </div>
 
         {/* Desktop Navigation Links */}
@@ -49,8 +51,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                onClick={() => playTacticalSound('click')}
-                className={`font-label-caps uppercase tracking-wider py-1 transition-colors duration-150 text-[13px] ${
+                className={`font-label-caps uppercase tracking-wider py-2 transition-colors duration-150 text-xl lg:text-2xl ${
                   isActive
                     ? 'border-b-2 border-[#cdf200] text-[#cdf200] font-bold'
                     : 'text-[#8f96a3] hover:text-[#e2e2ea]'
@@ -68,7 +69,6 @@ export default function Navbar() {
             href={CONTACT_INFO.discordUrl}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => playTacticalSound('click')}
             className="bg-[#cdf200] text-[#0c0e14] font-label-caps uppercase px-4 py-2 hover:bg-white transition-colors duration-150 font-bold tracking-wider text-[13px]"
           >
             JOIN DISCORD
@@ -84,10 +84,7 @@ export default function Navbar() {
 
           {/* Mobile Menu Button */}
           <button
-            onClick={() => {
-              playTacticalSound('click');
-              setMobileMenuOpen(!mobileMenuOpen);
-            }}
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-2 text-[#8f96a3] hover:text-[#e2e2ea] border border-[#33343b] bg-[#1d1f26]"
             aria-label="Toggle Navigation Menu"
           >
@@ -114,10 +111,7 @@ export default function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  onClick={() => {
-                    playTacticalSound('click');
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => setMobileMenuOpen(false)}
                   className={`px-3 py-2.5 font-headline-sm uppercase tracking-wide border flex items-center justify-between ${
                     isActive
                       ? 'border-[#cdf200] bg-[#1d1f26] text-[#cdf200]'

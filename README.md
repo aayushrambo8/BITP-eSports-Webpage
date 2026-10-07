@@ -1,4 +1,4 @@
-# BITP eSports Club Website
+# BITPeSports Website
 
 Next.js App Router website with a small Prisma-backed content manager. Frontend code lives in `src/frontend`, backend services and database schema live in `src/backend`, and the local SQLite database lives in `database`. Public pages read events, teams, rosters, committee members, matches, weekly activities, and results from the database. Club administrators manage content at `/admin`.
 
@@ -33,6 +33,10 @@ Start the site with `npm run dev`, then sign in at [http://localhost:3000/admin]
 The authenticated admin panel supports content management for events, game divisions, team rosters, committee members, achievements, matches, weekly activities, and competition results. It also provides a private contact inbox. Owners can invite users and assign roles; invitations and forgotten-password links are single-use and expire after 30 minutes. Users can also change their password after signing in.
 
 Roles are enforced by server-side API authorization: `OWNER` manages users and all content/inbox data, `ADMIN` manages content and the contact inbox but not accounts, and `EDITOR` can create/edit content but cannot delete content or access the inbox. An active owner must always remain.
+
+## Frontend image assets
+
+Frontend images are stored locally under `src/frontend/public/resources` and served from `/resources/...`; the site does not fetch the displayed photos or game artwork from remote image hosts. Add future frontend image assets to this folder and reference them with a `/resources/...` path.
 
 Public content endpoints are read-only. All content mutations use same-origin admin API routes protected by the signed, HTTP-only admin session cookie. Contact submissions are saved in the database and are not publicly readable.
 

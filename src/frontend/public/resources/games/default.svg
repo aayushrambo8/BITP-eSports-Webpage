@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" role="img" aria-labelledby="title">
+  <title id="title">Esports club game artwork</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#28321a"/>
+      <stop offset="1" stop-color="#101218"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="600" fill="url(#bg)"/>
+  <path d="m630 600 240-430 240 430z" fill="#cdf200" opacity=".14"/>
+  <circle cx="870" cy="285" r="170" fill="none" stroke="#cdf200" stroke-opacity=".3" stroke-width="4"/>
+  <path d="M0 490h1200M0 530h1200" stroke="#cdf200" stroke-opacity=".35" stroke-width="3"/>
+  <text x="74" y="395" fill="#cdf200" font-family="Arial,sans-serif" font-size="34" font-weight="700" letter-spacing="9">CLUB DIVISION</text>
+  <text x="68" y="500" fill="#fff" font-family="Arial,sans-serif" font-size="100" font-weight="800" letter-spacing="4">ESPORTS</text>
+</svg>

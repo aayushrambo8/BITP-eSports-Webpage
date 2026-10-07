@@ -11,7 +11,7 @@ export default function Footer() {
         <div className="space-y-1">
           <Link href="/" className="font-headline-sm uppercase text-white font-bold flex items-center gap-2">
             <span className="w-2.5 h-2.5 bg-[#88c425]"></span>
-            <span>APEX ESPORTS</span>
+            <span className="normal-case">BITPeSports</span>
           </Link>
           <p className="font-body-sm text-[#94a3b8]">
             Official Student Esports & Gaming Community
@@ -33,7 +33,7 @@ export default function Footer() {
             Contact
           </Link>
           <a
-            href="https://discord.gg/apexesports"
+            href="https://discord.gg/rXHBTSDkcf"
             target="_blank"
             rel="noopener noreferrer"
             className="text-[#94a3b8] hover:text-[#88c425] transition-colors"
@@ -41,7 +41,7 @@ export default function Footer() {
             Discord
           </a>
           <a
-            href="https://instagram.com/apexesportsclub"
+            href="https://www.instagram.com/bitpesports.gg/"
             target="_blank"
             rel="noopener noreferrer"
             className="text-[#94a3b8] hover:text-[#88c425] transition-colors"
@@ -52,7 +52,7 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-[#1e222b] mt-6 pt-4 text-xs font-body-sm text-[#64748b] flex flex-col sm:flex-row justify-between items-center gap-2">
-        <div>© 2025 APEX Esports Club. All rights reserved.</div>
+        <div>© 2025 <span className="normal-case">BITPeSports</span>. All rights reserved.</div>
         <div className="font-label-mono-sm text-[11px] text-[#64748b]">
           EA FC • VALORANT • FREE FIRE • BGMI
         </div>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEsportsModal } from '@/context/ModalContext';
 import { 
   CLUB_PILLARS, ABOUT_PAGE_ASSETS, CONTACT_INFO, type ClubOfficer,
+  localResourceImage,
 } from '@/data/esportsData';
 import { 
   Gamepad2, Users, Video, Monitor, Calendar, MessageSquare, 
@@ -48,7 +49,7 @@ export default function AboutPage() {
               <span className="text-[#cdf200]">CAMPUS BUILT.</span>
             </h1>
             <p className="font-body-lg text-[#8f96a3] max-w-2xl leading-relaxed">
-              Founded in 2021 by a group of passionate roommates, Apex Esports Club is the official competitive gaming and esports student organization on campus.
+              Founded in 2021 by a group of passionate roommates, BITPeSports is the official competitive gaming and esports student organization on campus.
             </p>
           </div>
 
@@ -177,7 +178,7 @@ export default function AboutPage() {
             >
               <div className="h-64 bg-[#111319] relative border-b border-[#33343b] overflow-hidden group">
                 <img
-                  src={officer.imageUrl}
+                  src={localResourceImage(officer.imageUrl, '/resources/people/default-avatar.svg')}
                   alt={officer.name}
                   className="w-full h-full object-cover grayscale contrast-125 group-hover:scale-105 transition-transform duration-300"
                 />

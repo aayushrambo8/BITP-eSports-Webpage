@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useEsportsModal } from '@/context/ModalContext';
 import { 
   CONTACT_INFO,
+  LOCAL_GAME_ART, localResourceImage,
   type ClubGame, type ScheduledMatch, type WeeklyScheduleItem, type RecentResult, type TournamentEvent,
 } from '@/data/esportsData';
 import { 
@@ -63,10 +64,6 @@ export default function Home() {
             <span className="font-label-mono-sm text-[#88c425] uppercase tracking-wider text-xs">
               Official Student Organization
             </span>
-            <span className="text-[#64748b]">•</span>
-            <span className="font-label-mono-sm text-[#94a3b8] uppercase text-xs">
-              Student Union Rm 204
-            </span>
           </div>
           <div className="font-label-mono-sm text-[#88c425] border border-[#262a36] bg-[#12141a] px-2 py-0.5 uppercase text-xs font-bold">
             SEASON 2025 // ACTIVE DIVISION
@@ -85,7 +82,7 @@ export default function Home() {
               COMPETITIVE ESPORTS & CAMPUS GAMING
             </h1>
             <p className="font-body-lg text-[#94a3b8] max-w-2xl leading-relaxed">
-              Official student-led esports club representing the university across <strong className="text-white">EA Sports FC</strong>, <strong className="text-white">Valorant</strong>, <strong className="text-white">Free Fire Mobile</strong>, and <strong className="text-white">BGMI</strong>. From casual campus lobbies to varsity qualifiers.
+              Official student-led esports club representing the university across <strong className="text-white">EA Sports FC</strong>, <strong className="text-white">Valorant</strong>, <strong className="text-white">Free Fire Mobile</strong>, <strong className="text-white">BGMI</strong> and more. From casual campus lobbies to varsity qualifiers.
             </p>
 
             <div className="pt-2 flex flex-wrap gap-4">
@@ -116,7 +113,7 @@ export default function Home() {
             <div className="space-y-2">
               <div className="flex justify-between items-center py-1">
                 <span className="font-label-caps text-[#94a3b8] uppercase text-sm">Active Members</span>
-                <span className="font-label-mono-lg font-bold text-white">350+</span>
+                <span className="font-label-mono-lg font-bold text-white">100+</span>
               </div>
               <div className="flex justify-between items-center py-1 border-t border-[#262a36]">
                 <span className="font-label-caps text-[#94a3b8] uppercase text-sm">Active Titles</span>
@@ -124,16 +121,16 @@ export default function Home() {
               </div>
               <div className="flex justify-between items-center py-1 border-t border-[#262a36]">
                 <span className="font-label-caps text-[#94a3b8] uppercase text-sm">Divisions</span>
-                <span className="font-label-mono-lg font-bold text-white">PC • Mobile • Console</span>
+                <span className="font-label-mono-lg font-bold text-white">PC • Mobile</span>
               </div>
               <div className="flex justify-between items-center py-1 border-t border-[#262a36]">
                 <span className="font-label-caps text-[#94a3b8] uppercase text-sm">Weekly Scrims</span>
-                <span className="font-label-mono-lg font-bold text-[#88c425]">Fri & Sat 7 PM</span>
+
               </div>
             </div>
             <div className="bg-[#191b22] p-3 border border-[#262a36] text-center">
-              <p className="font-label-mono-sm text-[#94a3b8] text-[11px]">
-                STUDENT UNION ROOM 204 • OPEN TO ALL REGISTERED STUDENTS
+              <p className="font-label-mono-sm text-[#94a3b8] text-[18px]">
+                OPEN TO ALL STUDENTS
               </p>
             </div>
           </div>
@@ -198,7 +195,7 @@ export default function Home() {
               NO UPCOMING EVENTS SCHEDULED
             </div>
             <p className="font-body-sm text-[#94a3b8] max-w-lg mx-auto">
-              The tournament schedule is currently clear. Events published from the administrator dashboard will automatically sync and appear here.
+              The tournament schedule is currently clear.
             </p>
             <div className="pt-2">
               <a
@@ -234,7 +231,7 @@ export default function Home() {
               {/* Top Banner Image with Gradient Overlay */}
               <div className="relative h-48 bg-[#0c0e14] overflow-hidden">
                 <img
-                  src={game.gameArt}
+                  src={LOCAL_GAME_ART[game.id] ?? localResourceImage(game.gameArt, '/resources/games/default.svg')}
                   alt={game.name}
                   className="w-full h-full object-cover grayscale contrast-125 opacity-40 group-hover:scale-105 group-hover:opacity-60 transition-all duration-500"
                 />
@@ -334,7 +331,7 @@ export default function Home() {
                         </span>
                       </div>
                       <div className="font-headline-sm text-white uppercase">
-                        Apex Esports <span className="text-[#94a3b8] font-normal">vs</span> {match.opponent}
+                        <span className="normal-case">BITPeSports</span> <span className="text-[#94a3b8] font-normal">vs</span> {match.opponent}
                       </div>
                     </div>
                   </div>

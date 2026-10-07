@@ -102,11 +102,11 @@ export default function EsportsModals() {
     playTacticalSound('click');
     const icsData = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Apex Esports Club//Campus Event//EN
+PRODID:-//BITPeSports//Campus Event//EN
 CALSCALE:GREGORIAN
 BEGIN:VEVENT
 SUMMARY:${eventTitle}
-DESCRIPTION:Official Apex Esports Club gathering at Student Union Lounge Rm 204.
+DESCRIPTION:Official BITPeSports gathering at Student Union Lounge Rm 204.
 LOCATION:Student Union Room 204, Campus Gaming Hub
 STATUS:CONFIRMED
 DTSTART:20251114T230000Z
@@ -182,7 +182,7 @@ END:VCALENDAR`;
                           required
                           value={regData.teamName}
                           onChange={(e) => setRegData({ ...regData, teamName: e.target.value })}
-                          placeholder="e.g. Apex Vanguard // 'Nova'"
+                          placeholder="e.g. BITPeSports Vanguard // 'Nova'"
                           className="w-full bg-[#191b22] border border-[#262a36] px-3 py-2 text-white font-body-md focus:border-[#cdf200] outline-none"
                         />
                       </div>
@@ -461,7 +461,7 @@ END:VCALENDAR`;
             <div className="space-y-6">
               <div className="border-b border-[#262a36] pb-3">
                 <span className="font-label-mono-sm text-[#cdf200] uppercase">TOURNAMENT STANDARD CODE</span>
-                <h3 className="font-headline-lg uppercase text-white mt-1">OFFICIAL APEX ESPORTS COMPETITION RULEBOOK</h3>
+                <h3 className="font-headline-lg uppercase text-white mt-1">OFFICIAL <span className="normal-case">BITPeSports</span> COMPETITION RULEBOOK</h3>
               </div>
 
               <div className="space-y-4 font-body-sm text-[#8f96a3]">
@@ -505,7 +505,7 @@ END:VCALENDAR`;
                   <Radio className="w-4 h-4 text-[#ff3344] animate-pulse" />
                   <span className="font-label-mono-sm text-[#ff3344] font-bold uppercase">LIVE ON TWITCH</span>
                   <span className="text-[#8f96a3]">|</span>
-                  <span className="font-headline-sm uppercase text-white">APEX ESPORTS // BROADCAST OPS</span>
+                  <span className="font-headline-sm uppercase text-white"><span className="normal-case">BITPeSports</span>{' // BROADCAST OPS'}</span>
                 </div>
                 <div className="font-label-mono-sm text-[#8f96a3]">1080P60 // 6000 KBPS</div>
               </div>
@@ -518,14 +518,14 @@ END:VCALENDAR`;
                     LIVE BROADCAST
                   </div>
                   <div className="bg-[#12141a]/90 border border-[#262a36] px-3 py-1 font-label-mono-sm text-[#cdf200] text-xs">
-                    MATCH: APEX ESPORTS 13 - 9 STATE TECH (MAP 3)
+                    MATCH: <span className="normal-case">BITPeSports</span> 13 - 9 STATE TECH (MAP 3)
                   </div>
                 </div>
 
                 {/* Center Broadcast Branding */}
                 <div className="text-center z-10 space-y-1">
                   <div className="font-display-hero-mobile text-[#cdf200] tracking-wider drop-shadow-md">
-                    APEX ESPORTS BROADCAST
+                    <span className="normal-case">BITPeSports</span> BROADCAST
                   </div>
                   <p className="font-label-mono-sm text-[#8f96a3]">
                     CASTERS: SAM &quot;SPECTRE&quot; K. &amp; ELENA &quot;NOVA&quot; S. • ECAC VARSITY SHOWCASE
@@ -540,7 +540,7 @@ END:VCALENDAR`;
 
               {/* Simulated Twitch Chat */}
               <div className="border border-[#262a36] bg-[#0c0e14] p-3 space-y-2 font-label-mono-sm text-xs max-h-36 overflow-y-auto">
-                <div><span className="text-[#cdf200]">campus_fan01:</span> let&apos;s go apex!! big clutch in haven B site!</div>
+                <div><span className="text-[#cdf200]">campus_fan01:</span> let&apos;s go BITPeSports!! big clutch in haven B site!</div>
                 <div><span className="text-[#8f96a3]">ecac_mod:</span> Reminder: Next match starts at 9:00 PM EST!</div>
                 <div><span className="text-[#cde7f2]">dorm_warrior:</span> Cipher&apos;s aim is insane today, 28 kills already</div>
                 <div><span className="text-[#cdf200]">nova_hype:</span> student union lounge is packed right now watching on the big screen!</div>
@@ -572,7 +572,7 @@ END:VCALENDAR`;
               <div className="border-b border-[#262a36] pb-3 flex justify-between items-end">
                 <div>
                   <span className="font-label-mono-sm text-[#cdf200] uppercase">COLLEGIATE VARSITY DIRECTORY</span>
-                  <h3 className="font-headline-lg uppercase text-white mt-1">APEX ESPORTS ACTIVE SQUAD</h3>
+                  <h3 className="font-headline-lg uppercase text-white mt-1"><span className="normal-case">BITPeSports</span> ACTIVE SQUAD</h3>
                 </div>
                 <span className="font-label-mono-sm text-[#8f96a3]">CONFERENCE: ECAC / CRL</span>
               </div>
@@ -620,7 +620,7 @@ END:VCALENDAR`;
                 <span className="font-label-mono-sm text-[#cdf200] uppercase">STUDENT INITIATIVES • CAMPUS GRANTS</span>
                 <h3 className="font-headline-lg uppercase text-white mt-1">SUBMIT CAMPUS EVENT PROPOSAL</h3>
                 <p className="font-body-sm text-[#8f96a3]">
-                  Propose a new tournament, charity stream, or campus LAN to the Apex Executive Board for equipment, room booking, and grant funding.
+                  Propose a new tournament, charity stream, or campus LAN to the BITPeSports Executive Board for equipment, room booking, and grant funding.
                 </p>
               </div>
 
@@ -806,7 +806,7 @@ END:VCALENDAR`;
                 onSubmit={(e) => {
                   e.preventDefault();
                   playTacticalSound('success');
-                  showToast('Authentication successful! Welcome to Apex Terminal.', 'success');
+                  showToast('Authentication successful! Welcome to BITPeSports Terminal.', 'success');
                   closeModal();
                 }}
                 className="space-y-4"
