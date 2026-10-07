@@ -162,15 +162,26 @@ model Officer {
   name      String
   handle    String
   role      String
+  rollNo    String   @default("")
   yearMajor String
   tag       String
   discord   String
   imageUrl  String
   order     Int      @default(0)
+  photo     OfficerPhoto?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([order])
+}
+
+model OfficerPhoto {
+  id        String   @id @default(uuid())
+  officerId String   @unique
+  data      Bytes
+  mimeType  String
+  updatedAt DateTime @updatedAt
+  officer   Officer  @relation(fields: [officerId], references: [id], onDelete: Cascade)
 }
 
 model TeamMember {

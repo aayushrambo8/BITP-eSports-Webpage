@@ -138,12 +138,8 @@ const resources: Record<ResourceKey, Resource> = {
     collection: 'officers',
     fields: [
       { name: 'name', label: 'Name', required: true },
-      { name: 'handle', label: 'Handle', required: true },
-      { name: 'role', label: 'Role', required: true },
-      { name: 'yearMajor', label: 'Year and major', required: true },
-      { name: 'tag', label: 'Short tag', required: true },
-      { name: 'discord', label: 'Discord handle', required: true },
-      { name: 'imageUrl', label: 'Image URL', type: 'url' },
+      { name: 'role', label: 'Post', type: 'select', options: ['President', 'Senior Coordinator', 'Junior Coordinator'], required: true },
+      { name: 'rollNo', label: 'Roll number', required: true },
       { name: 'order', label: 'Display order', type: 'number' },
     ],
   },
@@ -214,6 +210,7 @@ export default function AdminPage() {
   const [profileUsername, setProfileUsername] = useState('');
   const [activity, setActivity] = useState<AdminActivity[]>([]);
   const [eventPosterFile, setEventPosterFile] = useState<File | null>(null);
+  const [officerPhotoFile, setOfficerPhotoFile] = useState<File | null>(null);
 
   const resource = resources[active === 'users' || active === 'account' || active === 'activity' ? 'events' : active];
   const endpoint = resource.endpoint;
@@ -221,6 +218,13 @@ export default function AdminPage() {
     ? entries.find((entry) => entry.id === editingId)?.posterUrl
     : null;
   const existingEventPoster = typeof existingEventPosterValue === 'string' ? existingEventPosterValue : null;
+  const existingOfficerPhotoValue = active === 'officers' && editingId
+    ? entries.find((entry) => entry.id === editingId)?.photoUrl
+      ?? entries.find((entry) => entry.id === editingId)?.imageUrl
+    : null;
+  const existingOfficerPhoto = typeof existingOfficerPhotoValue === 'string' && existingOfficerPhotoValue
+    ? existingOfficerPhotoValue
+    : null;
 
   const loadEntries = useCallback(async () => {
     const response = await fetch(endpoint, { cache: 'no-store' });
@@ -480,6 +484,7 @@ export default function AdminPage() {
     }
     setEditingId(typeof entry.id === 'string' ? entry.id : null);
     setEventPosterFile(null);
+    setOfficerPhotoFile(null);
     setForm(values);
     setNotice('');
     setError('');
@@ -510,6 +515,7 @@ export default function AdminPage() {
       if (!response.ok) throw new Error(data.error || 'Could not save this item.');
 
       const savedEventId = active === 'events' ? String(data.event?.id ?? editingId ?? '') : '';
+      const savedOfficerId = active === 'officers' ? String(data.officer?.id ?? editingId ?? '') : '';
       if (active === 'events' && eventPosterFile) {
         if (!savedEventId) throw new Error('Event saved, but its ID was not returned; the poster was not uploaded.');
         const posterForm = new FormData();
@@ -522,10 +528,24 @@ export default function AdminPage() {
           throw new Error(`Event saved, but its poster could not be uploaded: ${posterData.error || 'Please try again.'}`);
         }
       }
+      if (active === 'officers' && officerPhotoFile) {
+        if (!savedOfficerId) throw new Error('Committee member saved, but its ID was not returned; the photo was not uploaded.');
+        const photoForm = new FormData();
+        photoForm.set('officerId', savedOfficerId);
+        photoForm.set('photo', officerPhotoFile);
+        const photoResponse = await fetch('/api/admin/officers/photo', { method: 'POST', body: photoForm });
+        const photoData = await photoResponse.json();
+        if (!photoResponse.ok) {
+          setEditingId(savedOfficerId);
+          await loadEntries();
+          throw new Error(`Committee member saved, but their photo could not be uploaded: ${photoData.error || 'Please try again.'}`);
+        }
+      }
 
       setForm(emptyForm(resource));
       setEditingId(null);
       setEventPosterFile(null);
+      setOfficerPhotoFile(null);
       setNotice(editingId ? 'Changes saved.' : 'Item added.');
       await loadEntries();
     } catch (saveError) {
@@ -554,6 +574,25 @@ export default function AdminPage() {
     }
   }
 
+  async function removeOfficerPhoto() {
+    if (!editingId || !window.confirm('Remove this committee member photo?')) return;
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch(`/api/admin/officers/photo?officerId=${encodeURIComponent(editingId)}`, { method: 'DELETE' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not remove this photo.');
+      setOfficerPhotoFile(null);
+      setNotice('Committee member photo removed.');
+      await loadEntries();
+    } catch (removeError) {
+      setError(removeError instanceof Error ? removeError.message : 'Could not remove this photo.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function deleteEntry(id: string) {
     if (!window.confirm('Delete this item? This cannot be undone.')) return;
     setBusy(true);
@@ -565,6 +604,7 @@ export default function AdminPage() {
       if (!response.ok) throw new Error(data.error || 'Could not delete this item.');
       if (editingId === id) {
         setEditingId(null);
+        setOfficerPhotoFile(null);
         setForm(emptyForm(resource));
       }
       setNotice('Item deleted.');
@@ -663,6 +703,8 @@ export default function AdminPage() {
             onClick={() => {
               setActive(key);
               setEditingId(null);
+              setEventPosterFile(null);
+              setOfficerPhotoFile(null);
               setForm(emptyForm(resources[key]));
               setError('');
               setNotice('');
@@ -829,11 +871,53 @@ export default function AdminPage() {
                   {eventPosterFile && <p className="text-sm text-[#cdf200]">Selected replacement poster: {eventPosterFile.name}</p>}
                 </div>
               )}
+              {active === 'officers' && (
+                <div className="space-y-2 sm:col-span-2">
+                  <label className="block space-y-1 text-xs uppercase tracking-wide text-[#8f96a3]">
+                    Team photo
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0] ?? null;
+                        if (file && file.size > 4 * 1024 * 1024) {
+                          setError('Team photos must be no larger than 4 MB.');
+                          event.target.value = '';
+                          setOfficerPhotoFile(null);
+                          return;
+                        }
+                        setError('');
+                        setOfficerPhotoFile(file);
+                      }}
+                      className="block w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white file:mr-3 file:border-0 file:bg-[#cdf200] file:px-3 file:py-1 file:font-bold file:text-[#0a0b0e]"
+                    />
+                    <span className="block normal-case">JPEG, PNG, or WebP. Maximum file size: 4 MB.</span>
+                  </label>
+                  {existingOfficerPhoto && (
+                    <div className="flex flex-wrap items-end gap-3">
+                      <Image
+                        src={existingOfficerPhoto}
+                        alt="Committee member photo preview"
+                        width={160}
+                        height={192}
+                        unoptimized
+                        className="h-48 w-40 border border-[#33343b] object-cover"
+                      />
+                      {editingId && !officerPhotoFile && (
+                        <button type="button" onClick={() => void removeOfficerPhoto()} disabled={busy} className="border border-red-900 px-3 py-2 text-xs uppercase text-red-200 hover:bg-red-950/40 disabled:opacity-50">
+                          Remove photo
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {officerPhotoFile && <p className="text-sm text-[#cdf200]">Selected photo: {officerPhotoFile.name}</p>}
+                </div>
+              )}
               <div className="flex gap-2 sm:col-span-2">
                 <button disabled={busy} className="bg-[#cdf200] px-4 py-2 font-label-caps text-xs font-bold uppercase text-[#0a0b0e] disabled:opacity-50">
                   {busy ? 'Saving…' : editingId ? 'Save changes' : 'Add item'}
                 </button>
-                {editingId && <button type="button" onClick={() => { setEditingId(null); setEventPosterFile(null); setForm(emptyForm(resource)); }} className="border border-[#33343b] px-4 py-2 text-xs uppercase text-white">Cancel</button>}
+                {editingId && <button type="button" onClick={() => { setEditingId(null); setEventPosterFile(null); setOfficerPhotoFile(null); setForm(emptyForm(resource)); }} className="border border-[#33343b] px-4 py-2 text-xs uppercase text-white">Cancel</button>}
               </div>
             </form>
           </section>

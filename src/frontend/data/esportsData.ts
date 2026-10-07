@@ -67,13 +67,16 @@ export interface TournamentEvent {
 }
 
 export interface ClubOfficer {
+  id: string;
   name: string;
   handle: string;
   role: string;
+  rollNo: string;
   yearMajor: string;
   tag: string;
   discord: string;
   imageUrl: string;
+  photoUrl?: string | null;
 }
 
 export interface ClubTeamMember {

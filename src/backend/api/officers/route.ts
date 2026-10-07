@@ -7,7 +7,20 @@ export async function GET() {
       orderBy: { order: "asc" },
       take: 100,
     });
-    return NextResponse.json({ success: true, officers });
+    const photos = await prisma.officerPhoto.findMany({
+      where: { officerId: { in: officers.map((officer) => officer.id) } },
+      select: { officerId: true, updatedAt: true },
+    });
+    const photoUpdatedAt = new Map(photos.map((photo) => [photo.officerId, photo.updatedAt.getTime()]));
+    return NextResponse.json({
+      success: true,
+      officers: officers.map((officer) => ({
+        ...officer,
+        photoUrl: photoUpdatedAt.has(officer.id)
+          ? `/api/officers/${officer.id}/photo?v=${photoUpdatedAt.get(officer.id)}`
+          : null,
+      })),
+    });
   } catch (error) {
     console.error("Public officer listing failed:", error instanceof Error ? error.name : "Unknown error");
     return NextResponse.json({ error: "Unable to load committee information." }, { status: 500 });

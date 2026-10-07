@@ -1,19 +1,97 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEsportsModal } from '@/context/ModalContext';
 import { 
   CLUB_PILLARS, ABOUT_PAGE_ASSETS, CONTACT_INFO, type ClubOfficer,
   localResourceImage,
 } from '@/data/esportsData';
 import { 
-  Gamepad2, Users, Video, Monitor, Calendar, MessageSquare, 
-  Info, ExternalLink, ShieldCheck, Cpu 
+  Calendar, ChevronLeft, ChevronRight, Gamepad2, MessageSquare,
 } from 'lucide-react';
 
+const carouselOffsets = [-1, 0, 1, 2] as const;
+
+function OfficerCarousel({ title, officers }: { title: string; officers: ClubOfficer[] }) {
+  const [index, setIndex] = useState(0);
+  const sortedOfficers = useMemo(
+    () => [...officers].sort((left, right) => left.name.localeCompare(right.name, 'en', { sensitivity: 'base' })),
+    [officers]
+  );
+
+  const move = (direction: -1 | 1) => {
+    setIndex((current) => (current + direction + sortedOfficers.length) % sortedOfficers.length);
+  };
+
+  return (
+    <section className="space-y-4">
+      <div className="flex items-center justify-between border-b border-[#33343b] pb-3">
+        <h3 className="font-headline-md uppercase text-white">{title}</h3>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            aria-label={`Previous ${title.toLowerCase()}`}
+            onClick={() => move(-1)}
+            disabled={sortedOfficers.length < 2}
+            className="border border-[#33343b] bg-[#191b22] p-2 text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+          <button
+            type="button"
+            aria-label={`Next ${title.toLowerCase()}`}
+            onClick={() => move(1)}
+            disabled={sortedOfficers.length < 2}
+            className="border border-[#33343b] bg-[#191b22] p-2 text-white disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+      {sortedOfficers.length === 0 ? (
+        <p className="border border-[#33343b] bg-[#0c0e14] p-5 text-sm text-[#8f96a3]">
+          No {title.toLowerCase()} profiles have been added yet.
+        </p>
+      ) : (
+        <div className="relative h-[25rem] overflow-hidden sm:h-[31rem] lg:h-auto lg:aspect-[8/5]" aria-roledescription="carousel">
+          {carouselOffsets.map((offset) => {
+            const officerIndex = (index + offset + sortedOfficers.length) % sortedOfficers.length;
+            const officer = sortedOfficers[officerIndex];
+            return (
+              <article
+                key={`${offset}-${officer.id}`}
+                aria-hidden={offset === -1 || offset === 2}
+                className="absolute top-0 w-[37.5%] border border-[#33343b] bg-[#191b22]"
+                style={{ left: `${12.5 + offset * 37.5}%` }}
+              >
+                <div className="relative aspect-[4/5] overflow-hidden bg-[#111319]">
+                  <Image
+                    src={officer.photoUrl ?? localResourceImage(officer.imageUrl, '/resources/people/default-avatar.svg')}
+                    alt={officer.name}
+                    fill
+                    sizes="(max-width: 768px) 38vw, 450px"
+                    unoptimized
+                    className="object-cover"
+                  />
+                </div>
+                <div className="min-h-24 border-t border-[#33343b] p-3 sm:p-4">
+                  <h4 className="truncate font-headline-sm uppercase text-white">{officer.name}</h4>
+                  <p className="mt-1 truncate font-label-mono-sm text-xs uppercase text-[#cdf200]">{officer.role}</p>
+                  <p className="mt-1 truncate text-xs text-[#8f96a3]">Roll No: {officer.rollNo}</p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default function AboutPage() {
-  const { openModal, playTacticalSound } = useEsportsModal();
+  const { playTacticalSound } = useEsportsModal();
   const [officers, setOfficers] = useState<ClubOfficer[]>([]);
 
   useEffect(() => {
@@ -133,35 +211,10 @@ export default function AboutPage() {
           <span className="font-label-mono-sm text-[#8f96a3] text-xs">ELECTED BY MEMBERSHIP</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {officers.map((officer) => (
-            <div
-              key={officer.name}
-              className="border border-[#33343b] bg-[#191b22] flex flex-col justify-between hover:border-[#cdf200] transition-colors"
-            >
-              <div className="h-64 bg-[#111319] relative border-b border-[#33343b] overflow-hidden group">
-                <img
-                  src={localResourceImage(officer.imageUrl, '/resources/people/default-avatar.svg')}
-                  alt={officer.name}
-                  className="w-full h-full object-cover grayscale contrast-125 group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute top-2 right-2 bg-[#0c0e14] border border-[#33343b] px-1.5 py-0.5">
-                  <span className="font-label-mono-sm text-[#cdf200] text-xs">{officer.tag}</span>
-                </div>
-              </div>
-
-              <div className="p-4 space-y-1">
-                <span className="font-label-mono-sm text-[#cdf200] uppercase block text-xs">
-                  {officer.role}
-                </span>
-                <h3 className="font-headline-sm uppercase text-white">{officer.name}</h3>
-                <p className="font-body-sm text-[#8f96a3]">{officer.yearMajor}</p>
-                <div className="pt-2 border-t border-[#33343b]/50 text-[11px] font-label-mono-sm text-[#8f96a3]">
-                  Discord: {officer.discord}
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="space-y-10">
+          <OfficerCarousel title="President" officers={officers.filter((officer) => officer.role.trim().toLowerCase() === 'president')} />
+          <OfficerCarousel title="Senior Coordinator" officers={officers.filter((officer) => officer.role.trim().toLowerCase() === 'senior coordinator')} />
+          <OfficerCarousel title="Junior Coordinator" officers={officers.filter((officer) => officer.role.trim().toLowerCase() === 'junior coordinator')} />
         </div>
       </section>
 
