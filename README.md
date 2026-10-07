@@ -1,6 +1,6 @@
 # BITPeSports Website
 
-Next.js App Router website with a small Prisma-backed content manager. Frontend code lives in `src/frontend`, backend services and database schema live in `src/backend`, and the local SQLite database lives in `database`. Public pages read events, teams, rosters, committee members, matches, weekly activities, and results from the database. Club administrators manage content at `/admin`.
+Next.js App Router website with a small Prisma-backed content manager. Frontend code lives in `src/frontend`, backend services and the PostgreSQL schema live in `src/backend`. Public pages read events, teams, rosters, committee members, matches, weekly activities, and results from the database. Club administrators manage content at `/admin`.
 
 ## Local setup
 
@@ -11,7 +11,7 @@ npm ci
 cp .env.example .env
 ```
 
-Set a unique `ADMIN_JWT_SECRET` in `.env` (for example, generate one with `openssl rand -base64 48`). Keep `.env` private; it is ignored by Git. Then initialize the local SQLite database and create an admin account:
+Set `DATABASE_URL` to a Prisma Postgres connection string and set a unique `ADMIN_JWT_SECRET` in `.env` (for example, generate one with `openssl rand -base64 48`). Keep `.env` private; it is ignored by Git. Then initialize the database schema and create an admin account:
 
 ```bash
 npm run db:generate
@@ -44,7 +44,7 @@ Public content endpoints are read-only. All content mutations use same-origin ad
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `DATABASE_URL` | Yes | Prisma database URL. SQLite is used; local default is `file:../../../database/dev.db` relative to the Prisma schema. |
+| `DATABASE_URL` | Yes | Prisma Postgres connection string (`postgres://...` or `postgresql://...`). |
 | `ADMIN_JWT_SECRET` | Yes | Random session-signing secret, at least 32 characters. Use a different secret per environment. |
 | `ADMIN_EMAIL` | Only when creating an admin | Initial administrator email. Do not leave bootstrap values configured after setup. |
 | `ADMIN_NAME` | Only when creating an admin | Initial administrator display name. |
@@ -60,17 +60,9 @@ If contact-notification settings are absent, contact messages remain stored in t
 
 ## Database and operations
 
-SQLite is simple for development and a single self-hosted production instance with a persistent disk. The production disk must persist the database file across deploys and restarts, and only one application instance should write to it. Ephemeral/serverless filesystems or multiple app instances are not suitable for this SQLite setup; use a managed PostgreSQL database before deploying in those environments and update the Prisma provider/schema accordingly.
+The application uses Prisma Postgres. Set `DATABASE_URL` in the Vercel project’s production environment and in the ignored local `.env` for local development. Do not commit or paste the connection string into source control.
 
-Back up the SQLite database before deploys and regularly in production. For example, with the SQLite CLI:
-
-```bash
-sqlite3 database/dev.db ".backup database/backup.db"
-```
-
-Restore by stopping the app, preserving the current database file, and copying the backup over the configured SQLite file before restarting. Store backups outside the web root and test restores periodically.
-
-The Prisma schema is `src/backend/prisma/schema.prisma`; its SQLite URL resolves to `database/dev.db`. After schema changes, run `npm run db:generate` and `npm run db:push`. For production, take a verified backup before schema changes. Do not use `db:push` against production without reviewing the schema change and backup first.
+The Prisma schema is `src/backend/prisma/schema.prisma`. Run `npm run db:generate`, then review and apply the schema with `npm run db:push`. Run the schema push only after configuring `DATABASE_URL` to the intended database; back up production data before future schema changes. A newly created database starts empty, so provision an Owner account and add public content through the admin panel.
 
 ## Security and deployment
 

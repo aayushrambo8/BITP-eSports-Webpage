@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev src/frontend",
-    "build": "next build src/frontend",
+    "build": "npm run db:generate && next build src/frontend",
     "start": "next start src/frontend",
     "lint": "eslint src/frontend/app src/frontend/components src/frontend/context src/frontend/data src/backend",
     "typecheck": "tsc --noEmit",

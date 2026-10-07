@@ -40,7 +40,7 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+        <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8 xl:gap-10">
           {navLinks.map((link) => {
             const isActive =
               link.href === '/'
@@ -51,7 +51,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`font-label-caps uppercase tracking-wider py-2 transition-colors duration-150 text-xl lg:text-2xl ${
+                className={`navbar-link px-1 py-2 transition-colors duration-150 ${
                   isActive
                     ? 'border-b-2 border-[#cdf200] text-[#cdf200] font-bold'
                     : 'text-[#8f96a3] hover:text-[#e2e2ea]'

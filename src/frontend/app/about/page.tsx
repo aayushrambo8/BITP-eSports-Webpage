@@ -41,38 +41,16 @@ export default function AboutPage() {
             <div className="inline-flex items-center gap-2 bg-[#1d1f26] border border-[#33343b] px-3 py-1">
               <span className="w-2 h-2 bg-[#cdf200]"></span>
               <span className="font-label-mono-sm text-[#cdf200] uppercase tracking-wider text-xs">
-                OFFICIAL CHARTERED STUDENT ORGANIZATION // RM 204
+                OFFICIAL CHARTERED STUDENT ORGANIZATION
               </span>
             </div>
             <h1 className="font-headline-xl text-white uppercase tracking-tight leading-none text-4xl sm:text-5xl md:text-6xl">
-              STUDENT RUN.<br />
-              <span className="text-[#cdf200]">CAMPUS BUILT.</span>
+              STUDENT RUN.
+              <span className="text-[#cdf200]"> CAMPUS BUILT.</span>
             </h1>
             <p className="font-body-lg text-[#8f96a3] max-w-2xl leading-relaxed">
-              Founded in 2021 by a group of passionate roommates, BITPeSports is the official competitive gaming and esports student organization on campus.
+              BITPeSports is the official competitive gaming and esports student organization on campus.
             </p>
-          </div>
-
-          {/* Meta Telemetry Sidebar */}
-          <div className="w-full lg:w-80 border border-[#33343b] bg-[#191b22] p-6 space-y-3 divide-y divide-[#33343b]">
-            <div className="pb-3">
-              <span className="font-label-mono-sm uppercase text-[#8f96a3] block text-xs">STATUS</span>
-              <span className="font-label-caps text-[#cdf200] uppercase font-bold text-sm">
-                ACTIVE 501(c)(7) AFFILIATE
-              </span>
-            </div>
-            <div className="py-3">
-              <span className="font-label-mono-sm uppercase text-[#8f96a3] block text-xs">CURRENT ACTIVE ROSTER</span>
-              <span className="font-label-mono-lg text-white font-bold">380+ REGISTERED STUDENTS</span>
-            </div>
-            <div className="py-3">
-              <span className="font-label-mono-sm uppercase text-[#8f96a3] block text-xs">HEADQUARTERS</span>
-              <span className="font-label-mono-sm text-white">STUDENT UNION LOUNGE, RM 204</span>
-            </div>
-            <div className="pt-3">
-              <span className="font-label-mono-sm uppercase text-[#8f96a3] block text-xs">COMPETITIVE ACCREDITATION</span>
-              <span className="font-label-mono-sm text-white">NACE STARLEAGUE // ECAC</span>
-            </div>
           </div>
         </div>
 
@@ -82,42 +60,27 @@ export default function AboutPage() {
           <div className="relative h-64 overflow-hidden group">
             <img
               src={ABOUT_PAGE_ASSETS.photo1}
-              alt={ABOUT_PAGE_ASSETS.photo1Caption}
+              alt="Esports arena"
               className="w-full h-full object-cover grayscale contrast-125 transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-[#0c0e14]/90 border-t border-[#33343b] p-2.5">
-              <span className="font-label-mono-sm text-[#8f96a3] uppercase text-xs">
-                {ABOUT_PAGE_ASSETS.photo1Caption}
-              </span>
-            </div>
           </div>
 
           {/* Photo 2 */}
           <div className="relative h-64 overflow-hidden group">
             <img
               src={ABOUT_PAGE_ASSETS.photo2}
-              alt={ABOUT_PAGE_ASSETS.photo2Caption}
+              alt="Livestream broadcast studio"
               className="w-full h-full object-cover grayscale contrast-125 transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-[#0c0e14]/90 border-t border-[#33343b] p-2.5">
-              <span className="font-label-mono-sm text-[#8f96a3] uppercase text-xs">
-                {ABOUT_PAGE_ASSETS.photo2Caption}
-              </span>
-            </div>
           </div>
 
           {/* Photo 3 */}
           <div className="relative h-64 overflow-hidden group">
             <img
               src={ABOUT_PAGE_ASSETS.photo3}
-              alt={ABOUT_PAGE_ASSETS.photo3Caption}
+              alt="Campus gaming"
               className="w-full h-full object-cover grayscale contrast-125 transition-transform duration-300 group-hover:scale-105"
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-[#0c0e14]/90 border-t border-[#33343b] p-2.5">
-              <span className="font-label-mono-sm text-[#8f96a3] uppercase text-xs">
-                {ABOUT_PAGE_ASSETS.photo3Caption}
-              </span>
-            </div>
           </div>
         </div>
       </section>

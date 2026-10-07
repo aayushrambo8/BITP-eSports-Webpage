@@ -114,11 +114,8 @@ export interface ContactSubmission {
 // -------------------------------------------------------------
 export const ABOUT_PAGE_ASSETS = {
   photo1: '/resources/about/esports-arena.jpg',
-  photo1Caption: 'FIG 01 // COLLEGIATE ESPORTS ARENA',
   photo2: '/resources/about/broadcast-studio.jpg',
-  photo2Caption: 'FIG 02 // LIVESTREAM SHOUTCAST STUDIO',
   photo3: '/resources/about/campus-gaming.jpg',
-  photo3Caption: 'FIG 03 // MOBILE & CONSOLE CHAMPIONSHIP',
 };
 
 export const LOCAL_GAME_ART: Record<string, string> = {

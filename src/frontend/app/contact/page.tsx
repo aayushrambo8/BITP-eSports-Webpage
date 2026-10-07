@@ -196,16 +196,6 @@ export default function ContactPage() {
                 </span>
               </div>
 
-              {/* Meeting Hours */}
-              <div className="bg-[#191b22] border border-[#33343b] p-4 space-y-1">
-                <span className="font-label-mono-sm text-[#8f96a3] uppercase block text-xs">
-                  OFFICER MEETING HOURS
-                </span>
-                <p className="font-body-sm text-white font-semibold">{CONTACT_INFO.officeHours}</p>
-                <span className="font-body-sm text-[#8f96a3] text-xs block">
-                  Student Union Building, Room 204
-                </span>
-              </div>
             </div>
           </div>
 

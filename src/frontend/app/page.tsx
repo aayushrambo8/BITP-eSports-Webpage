@@ -66,7 +66,7 @@ export default function Home() {
             </span>
           </div>
           <div className="font-label-mono-sm text-[#88c425] border border-[#262a36] bg-[#12141a] px-2 py-0.5 uppercase text-xs font-bold">
-            SEASON 2025 // ACTIVE DIVISION
+            SEASON 2k26
           </div>
         </div>
 
