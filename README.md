@@ -88,9 +88,11 @@ Save Vercel variables, then open **Deployments** and redeploy the latest success
 
 ## Content manager
 
-The authenticated admin panel supports content management for events, game divisions, team rosters, committee members, achievements, matches, weekly activities, and competition results. It also provides a private contact inbox. Owners can invite users and assign roles; invitations and forgotten-password links are single-use and expire after 30 minutes. Users can also change their password after signing in.
+The authenticated admin panel supports content management for events, game divisions, team rosters, committee members, achievements, matches, weekly activities, and competition results. It also provides a private contact inbox and an activity log that records the signed-in administrator's display name and email for content changes. Administrators can edit their own profile name and change their password. Owners can invite users and assign roles; invitations and forgotten-password links are single-use and expire after 30 minutes. Users can also change their password after signing in.
 
-Roles are enforced by server-side API authorization: `OWNER` manages users and all content/inbox data, `ADMIN` manages content and the contact inbox but not accounts, and `EDITOR` can create/edit content but cannot delete content or access the inbox. An active owner must always remain.
+To add a user, sign in at `/admin` as an `OWNER` or `ADMIN`, open **User accounts**, enter only the person's email address, choose a role if you are an Owner (Admins can only invite Moderators), and select **Send invitation**. Invitation email must be configured with Resend. The person follows the single-use email link to choose their own display name, unique username, and password. They can sign in using either their email or username. Admins can change their display name and username under **My profile**; activity records identify the username.
+
+Roles are enforced by server-side API authorization. `MODERATOR` can create, edit, and delete site content but cannot access the contact inbox or manage accounts. `ADMIN` has Moderator permissions, can access the contact inbox, invite Moderator accounts, and delete Moderator accounts; Admins cannot create, edit, delete, or change the roles/status of Admin or Owner accounts. `OWNER` can manage all content, inbox data, users, and roles. At least one active Owner must remain. Existing `EDITOR` accounts are migrated to `MODERATOR` when `npm run db:push` runs. Login, invitations, password changes, and reset flows use database-backed rate limits shared across serverless instances; reset links are single-use, expire after 30 minutes, and requesting a new reset link invalidates previous unused reset links.
 
 ## Frontend image assets
 
@@ -107,7 +109,7 @@ Public content endpoints are read-only. All content mutations use same-origin ad
 | `ADMIN_EMAIL` | Only when creating an admin | Initial administrator email. Do not leave bootstrap values configured after setup. |
 | `ADMIN_NAME` | Only when creating an admin | Initial administrator display name. |
 | `ADMIN_PASSWORD` | Only when creating an admin | Initial password, 14–72 UTF-8 bytes; remove after account creation. |
-| `ADMIN_ROLE` | Only when provisioning/promoting through CLI | `OWNER`, `ADMIN`, or `EDITOR`; defaults to `OWNER`. |
+| `ADMIN_ROLE` | Only when provisioning/promoting through CLI | `OWNER`, `ADMIN`, or `MODERATOR`; defaults to `OWNER`. |
 | `RESEND_API_KEY` | Required for invitations/reset links; optional otherwise | Resend API credential. |
 | `AUTH_FROM_EMAIL` | Required for invitations/reset links | Verified Resend sender for account emails. Falls back to `CONTACT_FROM_EMAIL`. |
 | `APP_BASE_URL` | Required for invitations/reset links | Public HTTPS URL used to generate password links, e.g. `https://club.example.org`. |

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAdminActivity } from "@/lib/admin-activity";
 import {
   inputErrorResponse,
   optionalInteger,
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
   try {
     const data = memberData(await readJsonObject(request));
     const member = await prisma.teamMember.create({ data: data as Parameters<typeof prisma.teamMember.create>[0]["data"] });
+    await recordAdminActivity({ action: "CREATE", entity: "Team roster member", entityId: member.id, itemLabel: member.name });
     return NextResponse.json({ success: true, member }, { status: 201 });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -62,6 +64,7 @@ export async function PUT(request: Request) {
     const body = await readJsonObject(request);
     const id = requiredText(body.id, "Member ID", 100);
     const member = await prisma.teamMember.update({ where: { id }, data: memberData(body, true) });
+    await recordAdminActivity({ action: "UPDATE", entity: "Team roster member", entityId: member.id, itemLabel: member.name });
     return NextResponse.json({ success: true, member });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -76,7 +79,8 @@ export async function DELETE(request: Request) {
   try {
     const id = new URL(request.url).searchParams.get("id");
     if (!id || id.length > 100) return NextResponse.json({ error: "A valid member ID is required." }, { status: 400 });
-    await prisma.teamMember.delete({ where: { id } });
+    const member = await prisma.teamMember.delete({ where: { id } });
+    await recordAdminActivity({ action: "DELETE", entity: "Team roster member", entityId: member.id, itemLabel: member.name });
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeServerError("Team member deletion failed:", error);

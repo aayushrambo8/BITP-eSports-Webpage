@@ -118,8 +118,8 @@ export type AdminPermission = "content:read" | "content:write" | "content:delete
 
 const ROLE_PERMISSIONS: Record<AdminRole, readonly AdminPermission[]> = {
   OWNER: ["content:read", "content:write", "content:delete", "inbox:read", "inbox:write", "users:manage"],
-  ADMIN: ["content:read", "content:write", "content:delete", "inbox:read", "inbox:write"],
-  EDITOR: ["content:read", "content:write"],
+  ADMIN: ["content:read", "content:write", "content:delete", "inbox:read", "inbox:write", "users:manage"],
+  MODERATOR: ["content:read", "content:write", "content:delete"],
 };
 
 export async function requireAdmin(
@@ -168,6 +168,7 @@ export function safeServerError(label: string, error: unknown) {
 
 export function requestIdentifier(request: Request) {
   const forwardedFor = request.headers.get("x-forwarded-for");
-  const clientIp = forwardedFor?.split(",")[0]?.trim() || request.headers.get("x-real-ip");
+  const forwardedAddresses = forwardedFor?.split(",");
+  const clientIp = forwardedAddresses?.at(-1)?.trim() || request.headers.get("x-real-ip");
   return clientIp && clientIp.length < 100 ? clientIp : "unknown";
 }

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAdminActivity } from "@/lib/admin-activity";
 import {
   inputErrorResponse,
   readJsonObject,
@@ -35,6 +36,7 @@ export async function PATCH(request: Request) {
       where: { id },
       data: { status: body.status },
     });
+    await recordAdminActivity({ action: "UPDATE", entity: "Contact submission", entityId: submission.id, itemLabel: `Updated status for ${submission.name}` });
     return NextResponse.json({ success: true, submission });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -51,7 +53,8 @@ export async function DELETE(request: Request) {
     if (!id || id.length > 100) {
       return NextResponse.json({ error: "A valid submission ID is required." }, { status: 400 });
     }
-    await prisma.contactSubmission.delete({ where: { id } });
+    const submission = await prisma.contactSubmission.delete({ where: { id } });
+    await recordAdminActivity({ action: "DELETE", entity: "Contact submission", entityId: submission.id, itemLabel: `Deleted submission from ${submission.name}` });
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeServerError("Contact inbox deletion failed:", error);

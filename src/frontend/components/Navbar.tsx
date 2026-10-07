@@ -1,16 +1,77 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEsportsModal } from '@/context/ModalContext';
-import { Menu, X, User } from 'lucide-react';
+import { LogOut, Menu, User, X } from 'lucide-react';
 import { CONTACT_INFO } from '@/data/esportsData';
+
+type AdminSessionUser = {
+  id: string;
+  email: string;
+  username: string | null;
+  name: string;
+  role: 'OWNER' | 'ADMIN' | 'EDITOR';
+};
+
+const AUTH_CHANGED_EVENT = 'admin-auth-changed';
 
 export default function Navbar() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [adminUser, setAdminUser] = useState<AdminSessionUser | null>(null);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const { showToast } = useEsportsModal();
+
+  useEffect(() => {
+    const syncFromLogin = (event: Event) => {
+      const { detail } = event as CustomEvent<AdminSessionUser | null>;
+      setAdminUser(detail);
+      setProfileOpen(false);
+    };
+
+    const refreshAdminSession = () => {
+      void fetch('/api/admin/logout', { cache: 'no-store' })
+        .then(async (response) => {
+          if (!response.ok) {
+            setAdminUser(null);
+            return;
+          }
+          const data = await response.json();
+          setAdminUser(data.authenticated ? data.user : null);
+        })
+        .catch(() => setAdminUser(null));
+    };
+
+    refreshAdminSession();
+    window.addEventListener(AUTH_CHANGED_EVENT, syncFromLogin);
+    window.addEventListener('focus', refreshAdminSession);
+
+    return () => {
+      window.removeEventListener(AUTH_CHANGED_EVENT, syncFromLogin);
+      window.removeEventListener('focus', refreshAdminSession);
+    };
+  }, []);
+
+  async function logout() {
+    setLoggingOut(true);
+    try {
+      const response = await fetch('/api/admin/logout', { method: 'POST' });
+      if (!response.ok) throw new Error('Could not sign out.');
+      setAdminUser(null);
+      window.dispatchEvent(new CustomEvent<AdminSessionUser | null>(AUTH_CHANGED_EVENT, { detail: null }));
+      showToast('Signed out successfully.');
+    } catch {
+      showToast('Could not sign out. Please try again.', 'error');
+    } finally {
+      setLoggingOut(false);
+      setProfileOpen(false);
+      setMobileMenuOpen(false);
+    }
+  }
 
   const navLinks = [
     { label: 'Home', href: '/' },
@@ -63,7 +124,7 @@ export default function Navbar() {
           })}
         </nav>
 
-        {/* Trailing Actions: JOIN DISCORD only & LOGIN button */}
+        {/* Trailing Actions */}
         <div className="flex items-center gap-3">
           <a
             href={CONTACT_INFO.discordUrl}
@@ -74,13 +135,47 @@ export default function Navbar() {
             JOIN DISCORD
           </a>
 
-          <Link
-            href="/admin"
-            className="bg-[#1d1f26] border border-[#33343b] text-[#e2e2ea] px-3.5 py-2 font-label-caps uppercase tracking-wider text-[13px] font-bold hover:border-[#cdf200] hover:text-white transition-colors duration-150 flex items-center gap-1.5"
-          >
-            <User className="w-3.5 h-3.5 text-[#cdf200]" />
-            <span>LOGIN</span>
-          </Link>
+          {adminUser && (
+            <div className="relative hidden md:block">
+              <button
+                type="button"
+                onClick={() => setProfileOpen((open) => !open)}
+                aria-expanded={profileOpen}
+                aria-label={`Profile menu for ${adminUser.name}`}
+                className="flex items-center gap-2 border border-[#33343b] bg-[#1d1f26] px-3.5 py-2 text-[#e2e2ea] transition-colors hover:border-[#cdf200] hover:text-white"
+              >
+                <User className="h-4 w-4 text-[#cdf200]" />
+                <span className="max-w-32 truncate font-label-caps text-[13px] font-bold uppercase tracking-wider">
+                  {adminUser.username ? `@${adminUser.username}` : adminUser.name}
+                </span>
+              </button>
+              {profileOpen && (
+                <div className="absolute right-0 top-full z-50 mt-2 w-56 border border-[#33343b] bg-[#111319] p-2 shadow-xl">
+                  <div className="border-b border-[#33343b] px-3 py-2">
+                    <p className="truncate text-sm font-bold text-[#e2e2ea]">{adminUser.username ? `@${adminUser.username}` : adminUser.name}</p>
+                    <p className="truncate text-xs text-[#8f96a3]">{adminUser.email}</p>
+                    <p className="mt-1 text-xs font-bold tracking-wider text-[#cdf200]">{adminUser.role}</p>
+                  </div>
+                  <Link
+                    href="/admin"
+                    onClick={() => setProfileOpen(false)}
+                    className="block px-3 py-2 text-sm text-[#e2e2ea] hover:bg-[#1d1f26]"
+                  >
+                    Admin panel
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={logout}
+                    disabled={loggingOut}
+                    className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-[#e2e2ea] hover:bg-[#1d1f26] disabled:opacity-50"
+                  >
+                    <LogOut className="h-4 w-4 text-[#cdf200]" />
+                    {loggingOut ? 'Signing out…' : 'Sign out'}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Mobile Menu Button */}
           <button
@@ -134,14 +229,30 @@ export default function Navbar() {
             >
               JOIN DISCORD
             </a>
-            <Link
-              href="/admin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center bg-[#1d1f26] border border-[#33343b] text-[#e2e2ea] py-2.5 font-label-caps font-bold uppercase tracking-wider flex items-center justify-center gap-2"
-            >
-              <User className="w-4 h-4 text-[#cdf200]" />
-              <span>ADMIN LOGIN</span>
-            </Link>
+            {adminUser && (
+              <>
+                <div className="border border-[#33343b] bg-[#1d1f26] px-3 py-2 text-center">
+                  <p className="font-bold text-[#e2e2ea]">{adminUser.name}</p>
+                  <p className="text-xs text-[#8f96a3]">{adminUser.role}</p>
+                </div>
+                <Link
+                  href="/admin"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full border border-[#33343b] bg-[#1d1f26] py-2.5 text-center font-label-caps font-bold uppercase tracking-wider text-[#e2e2ea]"
+                >
+                  Admin panel
+                </Link>
+                <button
+                  type="button"
+                  onClick={logout}
+                  disabled={loggingOut}
+                  className="flex w-full items-center justify-center gap-2 border border-[#33343b] bg-[#1d1f26] py-2.5 font-label-caps font-bold uppercase tracking-wider text-[#e2e2ea] disabled:opacity-50"
+                >
+                  <LogOut className="h-4 w-4 text-[#cdf200]" />
+                  {loggingOut ? 'SIGNING OUT…' : 'SIGN OUT'}
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}

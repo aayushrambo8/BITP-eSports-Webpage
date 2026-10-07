@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAdminActivity } from "@/lib/admin-activity";
 import {
   ApiInputError,
   inputErrorResponse,
@@ -106,6 +107,7 @@ export async function POST(request: Request) {
       }
       return tx.event.create({ data: data as Parameters<typeof tx.event.create>[0]["data"] });
     });
+    await recordAdminActivity({ action: "CREATE", entity: "Event", entityId: event.id, itemLabel: event.title });
     return NextResponse.json({ success: true, event }, { status: 201 });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -138,6 +140,7 @@ export async function PUT(request: Request) {
       }
       return tx.event.update({ where: { id }, data });
     });
+    await recordAdminActivity({ action: "UPDATE", entity: "Event", entityId: event.id, itemLabel: event.title });
     return NextResponse.json({ success: true, event });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -155,7 +158,8 @@ export async function DELETE(request: Request) {
     if (!id || id.length > 100) {
       return NextResponse.json({ error: "A valid event ID is required." }, { status: 400 });
     }
-    await prisma.event.delete({ where: { id } });
+    const event = await prisma.event.delete({ where: { id } });
+    await recordAdminActivity({ action: "DELETE", entity: "Event", entityId: event.id, itemLabel: event.title });
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeServerError("Event deletion failed:", error);

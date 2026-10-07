@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAdminActivity } from "@/lib/admin-activity";
 import {
   inputErrorResponse,
   optionalUrl,
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
   try {
     const data = matchData(await readJsonObject(request));
     const match = await prisma.match.create({ data: data as Parameters<typeof prisma.match.create>[0]["data"] });
+    await recordAdminActivity({ action: "CREATE", entity: "Match", entityId: match.id, itemLabel: `${match.discipline} vs ${match.opponent}` });
     return NextResponse.json({ success: true, match }, { status: 201 });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -59,6 +61,7 @@ export async function PUT(request: Request) {
     const id = requiredText(body.id, "Match ID", 100);
     const data = matchData(body, true);
     const match = await prisma.match.update({ where: { id }, data });
+    await recordAdminActivity({ action: "UPDATE", entity: "Match", entityId: match.id, itemLabel: `${match.discipline} vs ${match.opponent}` });
     return NextResponse.json({ success: true, match });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -75,7 +78,8 @@ export async function DELETE(request: Request) {
     if (!id || id.length > 100) {
       return NextResponse.json({ error: "A valid match ID is required." }, { status: 400 });
     }
-    await prisma.match.delete({ where: { id } });
+    const match = await prisma.match.delete({ where: { id } });
+    await recordAdminActivity({ action: "DELETE", entity: "Match", entityId: match.id, itemLabel: `${match.discipline} vs ${match.opponent}` });
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeServerError("Match deletion failed:", error);

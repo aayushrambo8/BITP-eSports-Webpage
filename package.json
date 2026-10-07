@@ -9,7 +9,8 @@
     "lint": "eslint src/frontend/app src/frontend/components src/frontend/context src/frontend/data src/backend",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate --schema src/backend/prisma/schema.prisma",
-    "db:push": "prisma db push --schema src/backend/prisma/schema.prisma",
+    "db:push": "prisma db push --schema src/backend/prisma/schema.prisma && npm run admin:backfill-usernames",
+    "admin:backfill-usernames": "node --env-file=.env --import tsx src/backend/scripts/backfill-admin-usernames.ts",
     "admin:create": "node --env-file=.env --import tsx src/backend/scripts/create-admin.ts"
   },
   "engines": {
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
+    "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.12",
     "lucide-react": "^1.52.0",

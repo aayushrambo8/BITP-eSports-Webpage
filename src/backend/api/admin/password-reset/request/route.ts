@@ -11,16 +11,15 @@ import {
   requiredText,
   safeServerError,
 } from "@/lib/api";
-import { checkRateLimit } from "@/lib/rateLimit";
+import { checkPersistentRateLimit } from "@/lib/rateLimit";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export async function POST(request: Request) {
   if (isCrossOriginRequest(request)) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  const ipLimit = checkRateLimit(`password-reset:${requestIdentifier(request)}`, 5, 60 * 60_000);
-  if (!ipLimit.success) return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
-
   try {
+    const ipLimit = await checkPersistentRateLimit(`password-reset:${requestIdentifier(request)}`, 5, 60 * 60_000);
+    if (!ipLimit.success) return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
     const body = await readJsonObject(request, 2_048);
     const email = requiredText(body.email, "Email", 254).toLowerCase();
     if (!EMAIL_PATTERN.test(email)) throw new ApiInputError("Enter a valid email address.");
@@ -28,7 +27,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Password reset email is temporarily unavailable." }, { status: 503 });
     }
     const emailKey = createHash("sha256").update(email).digest("hex");
-    if (!checkRateLimit(`password-reset-email:${emailKey}`, 3, 60 * 60_000).success) {
+    if (!(await checkPersistentRateLimit(`password-reset-email:${emailKey}`, 3, 60 * 60_000)).success) {
       return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
     }
 
@@ -36,8 +35,14 @@ export async function POST(request: Request) {
     if (user) {
       const token = randomBytes(32).toString("base64url");
       const tokenHash = createHash("sha256").update(token).digest("hex");
-      await prisma.passwordResetToken.create({
-        data: { userId: user.id, tokenHash, purpose: "RESET", expiresAt: new Date(Date.now() + 30 * 60_000) },
+      await prisma.$transaction(async (transaction) => {
+        await transaction.passwordResetToken.updateMany({
+          where: { userId: user.id, purpose: "RESET", usedAt: null },
+          data: { usedAt: new Date() },
+        });
+        await transaction.passwordResetToken.create({
+          data: { userId: user.id, tokenHash, purpose: "RESET", expiresAt: new Date(Date.now() + 30 * 60_000) },
+        });
       });
       try {
         await sendAdminPasswordEmail(user.email, token, "reset");

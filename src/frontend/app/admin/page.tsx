@@ -3,7 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 
 type ResourceKey = 'events' | 'matches' | 'sessions' | 'results' | 'games' | 'members' | 'officers' | 'achievements' | 'contact';
-type SectionKey = ResourceKey | 'users' | 'account';
+type SectionKey = ResourceKey | 'users' | 'account' | 'activity';
 type Field = {
   name: string;
   label: string;
@@ -18,7 +18,18 @@ type Resource = {
   fields: Field[];
 };
 type Entry = Record<string, unknown> & { id?: string };
-type AdminUser = { id: string; email: string; name: string; role: 'OWNER' | 'ADMIN' | 'EDITOR'; isActive: boolean };
+type AdminUser = { id: string; email: string; username: string | null; name: string; role: 'OWNER' | 'ADMIN' | 'MODERATOR'; isActive: boolean };
+type AdminActivity = {
+  id: string;
+  actorUsername: string | null;
+  actorName: string;
+  actorEmail: string;
+  action: string;
+  entity: string;
+  itemLabel: string;
+  createdAt: string;
+};
+type AdminProfile = Pick<AdminUser, 'id' | 'email' | 'username' | 'name' | 'role'>;
 
 const resources: Record<ResourceKey, Resource> = {
   events: {
@@ -187,18 +198,22 @@ export default function AdminPage() {
   const [entries, setEntries] = useState<Entry[]>([]);
   const [form, setForm] = useState<Record<string, string | boolean>>(emptyForm(resources.events));
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const [role, setRole] = useState<AdminUser['role'] | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [newUser, setNewUser] = useState({ name: '', email: '', role: 'EDITOR' as AdminUser['role'] });
+  const [newUser, setNewUser] = useState({ email: '', role: 'MODERATOR' as AdminUser['role'] });
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [profile, setProfile] = useState<AdminProfile | null>(null);
+  const [profileName, setProfileName] = useState('');
+  const [profileUsername, setProfileUsername] = useState('');
+  const [activity, setActivity] = useState<AdminActivity[]>([]);
 
-  const resource = resources[active === 'users' || active === 'account' ? 'events' : active];
+  const resource = resources[active === 'users' || active === 'account' || active === 'activity' ? 'events' : active];
   const endpoint = resource.endpoint;
 
   const loadEntries = useCallback(async () => {
@@ -232,7 +247,7 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    if (!authenticated || active === 'users' || active === 'account') return;
+    if (!authenticated || active === 'users' || active === 'account' || active === 'activity') return;
     let activeRequest = true;
     void fetch(endpoint, { cache: 'no-store' })
       .then(async (response) => {
@@ -248,6 +263,44 @@ export default function AdminPage() {
     };
   }, [active, authenticated, endpoint, resource.collection]);
 
+  useEffect(() => {
+    if (!authenticated || active !== 'activity') return;
+    let activeRequest = true;
+    void fetch('/api/admin/activity', { cache: 'no-store' })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Could not load activity.');
+        if (activeRequest) setActivity(data.activity);
+      })
+      .catch((loadError: unknown) => {
+        if (activeRequest) setError(loadError instanceof Error ? loadError.message : 'Could not load activity.');
+      });
+    return () => {
+      activeRequest = false;
+    };
+  }, [active, authenticated]);
+
+  useEffect(() => {
+    if (!authenticated || active !== 'account') return;
+    let activeRequest = true;
+    void fetch('/api/admin/profile', { cache: 'no-store' })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || 'Could not load profile.');
+        if (activeRequest) {
+          setProfile(data.profile);
+          setProfileName(data.profile.name);
+          setProfileUsername(data.profile.username ?? '');
+        }
+      })
+      .catch((loadError: unknown) => {
+        if (activeRequest) setError(loadError instanceof Error ? loadError.message : 'Could not load profile.');
+      });
+    return () => {
+      activeRequest = false;
+    };
+  }, [active, authenticated]);
+
   const fields = useMemo(() => resource.fields, [resource.fields]);
 
   async function submitLogin(event: FormEvent<HTMLFormElement>) {
@@ -258,12 +311,13 @@ export default function AdminPage() {
       const response = await fetch('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ identifier, password }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Login failed.');
       setAuthenticated(true);
       setRole(data.user.role);
+      window.dispatchEvent(new CustomEvent('admin-auth-changed', { detail: data.user }));
       setPassword('');
       setNotice('Signed in successfully.');
     } catch (loginError) {
@@ -281,7 +335,7 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    if (authenticated && active === 'users' && role === 'OWNER') {
+    if (authenticated && active === 'users' && (role === 'OWNER' || role === 'ADMIN')) {
       let activeRequest = true;
       void fetch('/api/admin/users', { cache: 'no-store' })
         .then(async (response) => {
@@ -312,7 +366,7 @@ export default function AdminPage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not invite this user.');
-      setNewUser({ name: '', email: '', role: 'EDITOR' });
+      setNewUser({ email: '', role: 'MODERATOR' });
       setNotice('Invitation sent. The account holder must set a password within 30 minutes.');
       await loadUsers();
     } catch (inviteError) {
@@ -343,6 +397,24 @@ export default function AdminPage() {
     }
   }
 
+  async function deleteUser(user: AdminUser) {
+    if (!window.confirm(`Delete ${user.role} account ${user.email}? This cannot be undone.`)) return;
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch(`/api/admin/users?id=${encodeURIComponent(user.id)}`, { method: 'DELETE' });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not delete this account.');
+      setNotice('User account deleted.');
+      await loadUsers();
+    } catch (deleteError) {
+      setError(deleteError instanceof Error ? deleteError.message : 'Could not delete this account.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   async function changePassword(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
@@ -362,6 +434,30 @@ export default function AdminPage() {
       setNotice('Password changed. Sign in again with the new password.');
     } catch (passwordError) {
       setError(passwordError instanceof Error ? passwordError.message : 'Could not change password.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function saveProfile(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    setError('');
+    setNotice('');
+    try {
+      const response = await fetch('/api/admin/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: profileName, username: profileUsername }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not update profile.');
+      setProfile(data.profile);
+      setProfileUsername(data.profile.username);
+      window.dispatchEvent(new CustomEvent('admin-auth-changed', { detail: data.profile }));
+      setNotice('Profile updated.');
+    } catch (profileError) {
+      setError(profileError instanceof Error ? profileError.message : 'Could not update profile.');
     } finally {
       setBusy(false);
     }
@@ -467,6 +563,7 @@ export default function AdminPage() {
       await fetch('/api/admin/logout', { method: 'POST' });
       setAuthenticated(false);
       setRole(null);
+      window.dispatchEvent(new CustomEvent('admin-auth-changed', { detail: null }));
       setEntries([]);
       setNotice('');
     } finally {
@@ -489,8 +586,8 @@ export default function AdminPage() {
           </div>
           {error && <p role="alert" className="border border-red-800 bg-red-950/40 p-3 text-sm text-red-200">{error}</p>}
           <label className="block space-y-1 text-sm text-[#8f96a3]">
-            Email
-            <input required type="email" autoComplete="username" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 text-white" />
+            Email or username
+            <input required autoComplete="username" value={identifier} onChange={(event) => setIdentifier(event.target.value)} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 text-white" />
           </label>
           <label className="block space-y-1 text-sm text-[#8f96a3]">
             Password
@@ -519,7 +616,7 @@ export default function AdminPage() {
       </div>
 
       <nav aria-label="Content sections" className="mb-6 flex flex-wrap gap-2">
-        {resourceKeys.filter((key) => key !== 'contact' || role !== 'EDITOR').map((key) => (
+        {resourceKeys.filter((key) => key !== 'contact' || role !== 'MODERATOR').map((key) => (
           <button
             key={key}
             onClick={() => {
@@ -534,27 +631,31 @@ export default function AdminPage() {
             {resources[key].label}
           </button>
         ))}
-        {role === 'OWNER' && (
+        {(role === 'OWNER' || role === 'ADMIN') && (
           <button onClick={() => { setActive('users'); setError(''); setNotice(''); }} className={`border px-3 py-2 text-xs font-bold uppercase ${active === 'users' ? 'border-[#cdf200] bg-[#cdf200] text-[#0a0b0e]' : 'border-[#33343b] bg-[#191b22] text-[#8f96a3] hover:text-white'}`}>
             User accounts
           </button>
         )}
         <button onClick={() => { setActive('account'); setError(''); setNotice(''); }} className={`border px-3 py-2 text-xs font-bold uppercase ${active === 'account' ? 'border-[#cdf200] bg-[#cdf200] text-[#0a0b0e]' : 'border-[#33343b] bg-[#191b22] text-[#8f96a3] hover:text-white'}`}>
-          My password
+          My profile
+        </button>
+        <button onClick={() => { setActive('activity'); setError(''); setNotice(''); }} className={`border px-3 py-2 text-xs font-bold uppercase ${active === 'activity' ? 'border-[#cdf200] bg-[#cdf200] text-[#0a0b0e]' : 'border-[#33343b] bg-[#191b22] text-[#8f96a3] hover:text-white'}`}>
+          Activity log
         </button>
       </nav>
 
       {error && <p role="alert" className="mb-4 border border-red-800 bg-red-950/40 p-3 text-sm text-red-200">{error}</p>}
       {notice && <p role="status" className="mb-4 border border-[#637500] bg-[#1d1f26] p-3 text-sm text-[#cdf200]">{notice}</p>}
 
-      {active === 'users' && role === 'OWNER' ? (
+      {active === 'users' && (role === 'OWNER' || role === 'ADMIN') ? (
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(20rem,0.8fr)_minmax(0,1fr)]">
           <section className="border border-[#33343b] bg-[#0c0e14] p-5">
             <h2 className="mb-4 font-headline-md uppercase text-white">Invite a user</h2>
             <form onSubmit={inviteUser} className="space-y-4">
-              <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Name<input required maxLength={100} value={newUser.name} onChange={(event) => setNewUser({ ...newUser, name: event.target.value })} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" /></label>
               <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Email<input required type="email" maxLength={254} value={newUser.email} onChange={(event) => setNewUser({ ...newUser, email: event.target.value })} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" /></label>
-              <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Privilege<select value={newUser.role} onChange={(event) => setNewUser({ ...newUser, role: event.target.value as AdminUser['role'] })} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 text-white"><option value="EDITOR">Editor</option><option value="ADMIN">Admin</option><option value="OWNER">Owner</option></select></label>
+              {role === 'OWNER' ? (
+                <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Privilege<select value={newUser.role} onChange={(event) => setNewUser({ ...newUser, role: event.target.value as AdminUser['role'] })} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 text-white"><option value="MODERATOR">Moderator</option><option value="ADMIN">Admin</option><option value="OWNER">Owner</option></select></label>
+              ) : <p className="text-sm text-[#8f96a3]">New accounts are created as <span className="font-bold text-[#cdf200]">Moderator</span>.</p>}
               <button disabled={busy} className="bg-[#cdf200] px-4 py-2 font-label-caps text-xs font-bold uppercase text-[#0a0b0e] disabled:opacity-50">Send invitation</button>
             </form>
           </section>
@@ -562,23 +663,55 @@ export default function AdminPage() {
             <h2 className="font-headline-md uppercase text-white">Accounts ({users.length})</h2>
             {users.map((user) => (
               <article key={user.id} className="flex flex-wrap items-center justify-between gap-4 border border-[#33343b] bg-[#0c0e14] p-4">
-                <div><h3 className="font-semibold text-white">{user.name}</h3><p className="text-sm text-[#8f96a3]">{user.email}<span aria-hidden="true"> / </span>{user.isActive ? user.role : `${user.role} / DISABLED`}</p></div>
+                <div><h3 className="font-semibold text-white">{user.username ? `@${user.username}` : user.name}</h3><p className="text-sm text-[#8f96a3]">{user.email}<span aria-hidden="true"> / </span>{user.isActive ? user.role : `${user.role} / DISABLED`}</p></div>
                 <div className="flex flex-wrap gap-2">
-                  <select aria-label={`Privilege for ${user.email}`} value={user.role} disabled={busy || !user.isActive} onChange={(event) => void updateUser(user, { role: event.target.value as AdminUser['role'] })} className="border border-[#33343b] bg-[#191b22] px-2 py-1 text-xs text-white"><option value="OWNER">Owner</option><option value="ADMIN">Admin</option><option value="EDITOR">Editor</option></select>
-                  <button disabled={busy} onClick={() => void updateUser(user, { isActive: !user.isActive })} className="border border-[#33343b] px-3 py-1 text-xs uppercase text-white">{user.isActive ? 'Disable' : 'Enable'}</button>
+                  {role === 'OWNER' ? (
+                    <>
+                      <select aria-label={`Privilege for ${user.email}`} value={user.role} disabled={busy || !user.isActive} onChange={(event) => void updateUser(user, { role: event.target.value as AdminUser['role'] })} className="border border-[#33343b] bg-[#191b22] px-2 py-1 text-xs text-white"><option value="OWNER">Owner</option><option value="ADMIN">Admin</option><option value="MODERATOR">Moderator</option></select>
+                      <button disabled={busy} onClick={() => void updateUser(user, { isActive: !user.isActive })} className="border border-[#33343b] px-3 py-1 text-xs uppercase text-white">{user.isActive ? 'Disable' : 'Enable'}</button>
+                      <button disabled={busy} onClick={() => void deleteUser(user)} className="border border-red-900 px-3 py-1 text-xs uppercase text-red-200 hover:bg-red-950/40">Delete</button>
+                    </>
+                  ) : user.role === 'MODERATOR' ? (
+                    <button disabled={busy} onClick={() => void deleteUser(user)} className="border border-red-900 px-3 py-1 text-xs uppercase text-red-200 hover:bg-red-950/40">Delete moderator</button>
+                  ) : null}
                 </div>
               </article>
             ))}
           </section>
         </div>
       ) : active === 'account' ? (
-        <section className="max-w-xl border border-[#33343b] bg-[#0c0e14] p-5">
-          <h2 className="mb-4 font-headline-md uppercase text-white">Change your password</h2>
-          <form onSubmit={changePassword} className="space-y-4">
-            <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Current password<input required type="password" autoComplete="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" /></label>
-            <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">New password (14–72 bytes)<input required minLength={14} maxLength={72} type="password" autoComplete="new-password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" /></label>
-            <button disabled={busy} className="bg-[#cdf200] px-4 py-2 font-label-caps text-xs font-bold uppercase text-[#0a0b0e] disabled:opacity-50">Change password</button>
-          </form>
+        <div className="grid max-w-3xl gap-6">
+          <section className="border border-[#33343b] bg-[#0c0e14] p-5">
+            <h2 className="mb-4 font-headline-md uppercase text-white">My profile</h2>
+            <p className="mb-4 text-sm text-[#8f96a3]">Your name and account role identify you in the site activity log.</p>
+            <form onSubmit={saveProfile} className="space-y-4">
+              <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Display name<input required maxLength={100} value={profileName} onChange={(event) => setProfileName(event.target.value)} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" /></label>
+              <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Username<input required minLength={3} maxLength={30} pattern="[A-Za-z0-9][A-Za-z0-9._-]{2,29}" value={profileUsername} onChange={(event) => setProfileUsername(event.target.value)} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" /><span className="block normal-case">3–30 letters, numbers, dots, underscores, or hyphens.</span></label>
+              <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Email<input readOnly value={profile?.email ?? ''} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-[#8f96a3]" /></label>
+              <p className="text-sm text-[#8f96a3]">Role: <span className="font-bold text-[#cdf200]">{profile?.role ?? role}</span></p>
+              <button disabled={busy} className="bg-[#cdf200] px-4 py-2 font-label-caps text-xs font-bold uppercase text-[#0a0b0e] disabled:opacity-50">Save profile</button>
+            </form>
+          </section>
+          <section className="border border-[#33343b] bg-[#0c0e14] p-5">
+            <h2 className="mb-4 font-headline-md uppercase text-white">Change your password</h2>
+            <form onSubmit={changePassword} className="space-y-4">
+              <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Current password<input required type="password" autoComplete="current-password" value={currentPassword} onChange={(event) => setCurrentPassword(event.target.value)} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" /></label>
+              <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">New password (14–72 bytes)<input required minLength={14} maxLength={72} type="password" autoComplete="new-password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" /></label>
+              <button disabled={busy} className="bg-[#cdf200] px-4 py-2 font-label-caps text-xs font-bold uppercase text-[#0a0b0e] disabled:opacity-50">Change password</button>
+            </form>
+          </section>
+        </div>
+      ) : active === 'activity' ? (
+        <section className="space-y-3">
+          <h2 className="font-headline-md uppercase text-white">Recent admin activity</h2>
+          {activity.length === 0 && <p className="border border-[#33343b] bg-[#0c0e14] p-5 text-sm text-[#8f96a3]">No changes have been recorded yet.</p>}
+          {activity.map((item) => (
+            <article key={item.id} className="border border-[#33343b] bg-[#0c0e14] p-4">
+              <p className="font-semibold text-white">{item.actorUsername ? `@${item.actorUsername}` : item.actorName} <span className="font-normal text-[#8f96a3]">({item.actorEmail})</span></p>
+              <p className="mt-1 text-sm text-[#8f96a3]">{item.action} {item.entity}: <span className="text-[#e2e2ea]">{item.itemLabel}</span></p>
+              <time className="mt-1 block text-xs text-[#8f96a3]" dateTime={item.createdAt}>{new Date(item.createdAt).toLocaleString()}</time>
+            </article>
+          ))}
         </section>
       ) : active !== 'contact' ? (
         <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
@@ -638,7 +771,7 @@ export default function AdminPage() {
                     </div>
                     <div className="flex shrink-0 gap-2">
                       <button onClick={() => startEditing(entry)} className="border border-[#33343b] px-3 py-1 text-xs uppercase text-white hover:border-[#cdf200]">Edit</button>
-                      {role !== 'EDITOR' && <button onClick={() => void deleteEntry(id)} disabled={!id || busy} className="border border-red-900 px-3 py-1 text-xs uppercase text-red-200 hover:bg-red-950/40 disabled:opacity-50">Delete</button>}
+                      <button onClick={() => void deleteEntry(id)} disabled={!id || busy} className="border border-red-900 px-3 py-1 text-xs uppercase text-red-200 hover:bg-red-950/40 disabled:opacity-50">Delete</button>
                     </div>
                   </div>
                 </article>

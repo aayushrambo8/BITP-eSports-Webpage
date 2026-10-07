@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAdminActivity } from "@/lib/admin-activity";
 import {
   inputErrorResponse,
   optionalText,
@@ -35,6 +36,7 @@ export async function POST(request: Request) {
   try {
     const data = sessionData(await readJsonObject(request));
     const session = await prisma.weeklySession.create({ data: data as Parameters<typeof prisma.weeklySession.create>[0]["data"] });
+    await recordAdminActivity({ action: "CREATE", entity: "Weekly activity", entityId: session.id, itemLabel: session.title });
     return NextResponse.json({ success: true, session }, { status: 201 });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -53,6 +55,7 @@ export async function PUT(request: Request) {
       where: { id },
       data: sessionData(body, true),
     });
+    await recordAdminActivity({ action: "UPDATE", entity: "Weekly activity", entityId: session.id, itemLabel: session.title });
     return NextResponse.json({ success: true, session });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -69,7 +72,8 @@ export async function DELETE(request: Request) {
     if (!id || id.length > 100) {
       return NextResponse.json({ error: "A valid session ID is required." }, { status: 400 });
     }
-    await prisma.weeklySession.delete({ where: { id } });
+    const session = await prisma.weeklySession.delete({ where: { id } });
+    await recordAdminActivity({ action: "DELETE", entity: "Weekly activity", entityId: session.id, itemLabel: session.title });
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeServerError("Weekly session deletion failed:", error);

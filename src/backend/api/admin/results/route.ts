@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAdminActivity } from "@/lib/admin-activity";
 import {
   ApiInputError,
   inputErrorResponse,
@@ -57,6 +58,7 @@ export async function POST(request: Request) {
   try {
     const data = resultData(await readJsonObject(request));
     const result = await prisma.result.create({ data: data as Parameters<typeof prisma.result.create>[0]["data"] });
+    await recordAdminActivity({ action: "CREATE", entity: "Result", entityId: result.id, itemLabel: `${result.team1} vs ${result.team2}` });
     return NextResponse.json({ success: true, result }, { status: 201 });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -75,6 +77,7 @@ export async function PUT(request: Request) {
       where: { id },
       data: resultData(body, true),
     });
+    await recordAdminActivity({ action: "UPDATE", entity: "Result", entityId: result.id, itemLabel: `${result.team1} vs ${result.team2}` });
     return NextResponse.json({ success: true, result });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -91,7 +94,8 @@ export async function DELETE(request: Request) {
     if (!id || id.length > 100) {
       return NextResponse.json({ error: "A valid result ID is required." }, { status: 400 });
     }
-    await prisma.result.delete({ where: { id } });
+    const result = await prisma.result.delete({ where: { id } });
+    await recordAdminActivity({ action: "DELETE", entity: "Result", entityId: result.id, itemLabel: `${result.team1} vs ${result.team2}` });
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeServerError("Result deletion failed:", error);

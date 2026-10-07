@@ -11,7 +11,17 @@ const nextConfig: NextConfig = {
     if (process.env.NODE_ENV === 'production') {
       headers.push({ key: 'Strict-Transport-Security', value: 'max-age=31536000' });
     }
-    return [{ source: '/:path*', headers }];
+    return [
+      { source: '/:path*', headers },
+      {
+        source: '/admin/reset-password/:path*',
+        headers: [{ key: 'Referrer-Policy', value: 'no-referrer' }, { key: 'Cache-Control', value: 'no-store' }],
+      },
+      {
+        source: '/api/admin/:path*',
+        headers: [{ key: 'Cache-Control', value: 'no-store' }],
+      },
+    ];
   },
 };
 

@@ -2,15 +2,15 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { clearAdminSessionCookie, getAdminSession, hashPassword, verifyPassword } from "@/lib/auth";
 import { ApiInputError, inputErrorResponse, readJsonObject, requireAdmin, requestIdentifier, safeServerError } from "@/lib/api";
-import { checkRateLimit } from "@/lib/rateLimit";
+import { checkPersistentRateLimit } from "@/lib/rateLimit";
 
 export async function PATCH(request: Request) {
   const authorization = await requireAdmin(request, true);
   if (authorization) return authorization;
-  if (!checkRateLimit(`password-change:${requestIdentifier(request)}`, 5, 60_000).success) {
-    return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429 });
-  }
   try {
+    if (!(await checkPersistentRateLimit(`password-change:${requestIdentifier(request)}`, 5, 60 * 60_000)).success) {
+      return NextResponse.json({ error: "Too many attempts. Please try again later." }, { status: 429 });
+    }
     const body = await readJsonObject(request, 2_048);
     const session = await getAdminSession();
     if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

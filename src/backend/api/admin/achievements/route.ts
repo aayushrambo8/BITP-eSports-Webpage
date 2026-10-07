@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAdminActivity } from "@/lib/admin-activity";
 import {
   inputErrorResponse,
   optionalInteger,
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
     const achievement = await prisma.achievement.create({
       data: data as Parameters<typeof prisma.achievement.create>[0]["data"],
     });
+    await recordAdminActivity({ action: "CREATE", entity: "Achievement", entityId: achievement.id, itemLabel: achievement.title });
     return NextResponse.json({ success: true, achievement }, { status: 201 });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -67,6 +69,7 @@ export async function PUT(request: Request) {
       where: { id },
       data: achievementData(body, true),
     });
+    await recordAdminActivity({ action: "UPDATE", entity: "Achievement", entityId: achievement.id, itemLabel: achievement.title });
     return NextResponse.json({ success: true, achievement });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -81,7 +84,8 @@ export async function DELETE(request: Request) {
   try {
     const id = new URL(request.url).searchParams.get("id");
     if (!id || id.length > 100) return NextResponse.json({ error: "A valid achievement ID is required." }, { status: 400 });
-    await prisma.achievement.delete({ where: { id } });
+    const achievement = await prisma.achievement.delete({ where: { id } });
+    await recordAdminActivity({ action: "DELETE", entity: "Achievement", entityId: achievement.id, itemLabel: achievement.title });
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeServerError("Achievement deletion failed:", error);

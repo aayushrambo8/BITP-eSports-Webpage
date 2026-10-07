@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAdminActivity } from "@/lib/admin-activity";
 import {
   ApiInputError,
   inputErrorResponse,
@@ -91,6 +92,7 @@ export async function POST(request: Request) {
   try {
     const data = gameData(await readJsonObject(request));
     const game = await prisma.gameTitle.create({ data: data as Parameters<typeof prisma.gameTitle.create>[0]["data"] });
+    await recordAdminActivity({ action: "CREATE", entity: "Game", entityId: game.slug, itemLabel: game.name });
     return NextResponse.json({ success: true, game: { ...game, id: game.slug } }, { status: 201 });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -107,6 +109,7 @@ export async function PUT(request: Request) {
     const id = requiredText(body.id, "Game ID", 100);
     const data = gameData(body, true);
     const game = await prisma.gameTitle.update({ where: { slug: id }, data });
+    await recordAdminActivity({ action: "UPDATE", entity: "Game", entityId: game.slug, itemLabel: game.name });
     return NextResponse.json({ success: true, game: { ...game, id: game.slug } });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -121,7 +124,8 @@ export async function DELETE(request: Request) {
   try {
     const id = new URL(request.url).searchParams.get("id");
     if (!id || id.length > 100) return NextResponse.json({ error: "A valid game ID is required." }, { status: 400 });
-    await prisma.gameTitle.delete({ where: { slug: id } });
+    const game = await prisma.gameTitle.delete({ where: { slug: id } });
+    await recordAdminActivity({ action: "DELETE", entity: "Game", entityId: game.slug, itemLabel: game.name });
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeServerError("Game roster deletion failed:", error);

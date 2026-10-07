@@ -10,15 +10,41 @@ generator client {
 model AdminUser {
   id                 String               @id @default(uuid())
   email              String               @unique
+  username           String?              @unique
   name               String
   password           String
-  role               String               @default("EDITOR")
+  role               String               @default("MODERATOR")
   isActive           Boolean              @default(true)
   mustSetPassword    Boolean              @default(false)
   authVersion        Int                  @default(0)
   createdAt          DateTime             @default(now())
   updatedAt          DateTime             @updatedAt
   passwordResetTokens PasswordResetToken[]
+}
+
+model AdminActivity {
+  id         String   @id @default(uuid())
+  actorId    String
+  actorUsername String?
+  actorName  String
+  actorEmail String
+  action     String
+  entity     String
+  entityId   String?
+  itemLabel  String
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+}
+
+model AuthRateLimit {
+  key             String   @id
+  windowStartedAt DateTime
+  count           Int
+  updatedAt       DateTime @updatedAt
+
+  @@index([windowStartedAt])
 }
 
 model PasswordResetToken {

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { recordAdminActivity } from "@/lib/admin-activity";
 import {
   inputErrorResponse,
   optionalInteger,
@@ -44,6 +45,7 @@ export async function POST(request: Request) {
   try {
     const data = officerData(await readJsonObject(request));
     const officer = await prisma.officer.create({ data: data as Parameters<typeof prisma.officer.create>[0]["data"] });
+    await recordAdminActivity({ action: "CREATE", entity: "Committee member", entityId: officer.id, itemLabel: officer.name });
     return NextResponse.json({ success: true, officer }, { status: 201 });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -59,6 +61,7 @@ export async function PUT(request: Request) {
     const body = await readJsonObject(request);
     const id = requiredText(body.id, "Officer ID", 100);
     const officer = await prisma.officer.update({ where: { id }, data: officerData(body, true) });
+    await recordAdminActivity({ action: "UPDATE", entity: "Committee member", entityId: officer.id, itemLabel: officer.name });
     return NextResponse.json({ success: true, officer });
   } catch (error) {
     const inputResponse = inputErrorResponse(error);
@@ -73,7 +76,8 @@ export async function DELETE(request: Request) {
   try {
     const id = new URL(request.url).searchParams.get("id");
     if (!id || id.length > 100) return NextResponse.json({ error: "A valid officer ID is required." }, { status: 400 });
-    await prisma.officer.delete({ where: { id } });
+    const officer = await prisma.officer.delete({ where: { id } });
+    await recordAdminActivity({ action: "DELETE", entity: "Committee member", entityId: officer.id, itemLabel: officer.name });
     return NextResponse.json({ success: true });
   } catch (error) {
     return safeServerError("Officer deletion failed:", error);

@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 const COOKIE_NAME = "admin_session";
-export const ADMIN_ROLES = ["OWNER", "ADMIN", "EDITOR"] as const;
+export const ADMIN_ROLES = ["OWNER", "ADMIN", "MODERATOR"] as const;
 export type AdminRole = (typeof ADMIN_ROLES)[number];
 
 export function isAdminRole(role: unknown): role is AdminRole {
@@ -30,6 +30,8 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 export async function createAdminToken(payload: { id: string; email: string; role: AdminRole; authVersion: number }) {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuer("bitpesports")
+    .setAudience("bitpesports-admin")
     .setIssuedAt()
     .setExpirationTime("24h")
     .sign(getJwtSecret());
@@ -37,7 +39,11 @@ export async function createAdminToken(payload: { id: string; email: string; rol
 
 export async function verifyAdminToken(token: string) {
   try {
-    const verified = await jwtVerify(token, getJwtSecret());
+    const verified = await jwtVerify(token, getJwtSecret(), {
+      algorithms: ["HS256"],
+      issuer: "bitpesports",
+      audience: "bitpesports-admin",
+    });
     const { id, email, role, authVersion } = verified.payload;
     if (
       typeof id !== "string" ||
@@ -77,10 +83,10 @@ export async function getAdminSession() {
   if (!payload) return null;
   const user = await prisma.adminUser.findUnique({
     where: { id: payload.id },
-    select: { id: true, email: true, name: true, role: true, isActive: true, mustSetPassword: true, authVersion: true },
+    select: { id: true, email: true, username: true, name: true, role: true, isActive: true, mustSetPassword: true, authVersion: true },
   });
   if (!user || !user.isActive || user.mustSetPassword || user.authVersion !== payload.authVersion || !isAdminRole(user.role)) {
     return null;
   }
-  return { id: user.id, email: user.email, name: user.name, role: user.role, authVersion: user.authVersion };
+  return { id: user.id, email: user.email, username: user.username, name: user.name, role: user.role, authVersion: user.authVersion };
 }
