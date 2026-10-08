@@ -83,6 +83,8 @@ export const CLUB_OFFICER_PHOTOS: Record<string, string> = {
   'aayush arya': '/resources/people/aayush-arya-senior-coordinator.webp',
   'aayush babu': '/resources/people/aayush-babu-senior-coordinator.webp',
   'akshay kumar keshav': '/resources/people/akshay-kumar-keshav-junior-coordinator.webp',
+  'amartya prakash': '/resources/people/amartya-prakash-junior-coordinator.webp',
+  'asmit arya': '/resources/people/asmit-arya-junior-coordinator.webp',
   'aryan nirala': '/resources/people/aryan-nirala-junior-coordinator.webp',
   'daksha chandra': '/resources/people/daksha-chandra-junior-coordinator.webp',
   hridayesh: '/resources/people/hridayesh-junior-coordinator.webp',

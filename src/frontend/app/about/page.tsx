@@ -13,6 +13,30 @@ import {
 } from 'lucide-react';
 
 const carouselOffsets = [-1, 0, 1, 2] as const;
+const additionalJuniorCoordinators: ClubOfficer[] = [
+  {
+    id: 'amartya-prakash',
+    name: 'Amartya Prakash',
+    handle: '',
+    role: 'Junior Coordinator',
+    rollNo: 'BTECH/15259/25',
+    yearMajor: '',
+    tag: '',
+    discord: '',
+    imageUrl: '',
+  },
+  {
+    id: 'asmit-arya',
+    name: 'Asmit Arya',
+    handle: '',
+    role: 'Junior Coordinator',
+    rollNo: 'BTECH/15182/25',
+    yearMajor: '',
+    tag: '',
+    discord: '',
+    imageUrl: '',
+  },
+];
 
 function officerPhoto(officer: ClubOfficer) {
   const key = officer.name.trim().toLocaleLowerCase('en');
@@ -97,7 +121,7 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
 
 export default function AboutPage() {
   const { playTacticalSound } = useEsportsModal();
-  const [officers, setOfficers] = useState<ClubOfficer[]>([]);
+  const [officers, setOfficers] = useState<ClubOfficer[]>(additionalJuniorCoordinators);
 
   useEffect(() => {
     let active = true;
@@ -105,7 +129,17 @@ export default function AboutPage() {
       .then(async (response) => {
         if (!response.ok) throw new Error('Unable to load committee information.');
         const data = await response.json();
-        if (active && Array.isArray(data.officers)) setOfficers(data.officers);
+        if (active && Array.isArray(data.officers)) {
+          const existingNames = new Set(
+            (data.officers as ClubOfficer[]).map((officer) => officer.name.trim().toLocaleLowerCase('en'))
+          );
+          setOfficers([
+            ...(data.officers as ClubOfficer[]),
+            ...additionalJuniorCoordinators.filter(
+              (officer) => !existingNames.has(officer.name.toLocaleLowerCase('en'))
+            ),
+          ]);
+        }
       })
       .catch((error: unknown) => {
         console.error('Unable to refresh officers:', error instanceof Error ? error.name : 'Unknown error');

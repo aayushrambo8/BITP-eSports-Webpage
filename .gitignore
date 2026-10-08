@@ -40,6 +40,7 @@ yarn-error.log*
 /database/*.sqlite*
 /database/*.bak
 /.idea/
+/.Picture
 
 # vercel
 .vercel
