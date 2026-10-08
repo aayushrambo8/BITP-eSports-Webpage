@@ -141,7 +141,8 @@ const resources: Record<ResourceKey, Resource> = {
     collection: 'officers',
     fields: [
       { name: 'name', label: 'Name', required: true },
-      { name: 'role', label: 'Post', type: 'select', options: ['President', 'Senior Coordinator', 'Junior Coordinator'], required: true },
+      { name: 'group', label: 'Committee section', type: 'select', options: ['President', 'Core Executive', 'Senior Coordinator', 'Junior Coordinator'], required: true },
+      { name: 'role', label: 'Post', required: true, maxLength: 100 },
       { name: 'department', label: 'Department (A)', required: true, maxLength: 20, pattern: '[A-Za-z]+' },
       { name: 'studentNumber', label: 'Unique number (B)', required: true, maxLength: 12, pattern: '[0-9]+', inputMode: 'numeric' },
       { name: 'enrollmentYear', label: 'Enrollment year (C)', required: true, maxLength: 4, pattern: '[0-9]{2,4}', inputMode: 'numeric' },

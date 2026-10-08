@@ -13,29 +13,35 @@ import {
 } from 'lucide-react';
 
 const carouselOffsets = [-1, 0, 1, 2] as const;
-const additionalJuniorCoordinators: ClubOfficer[] = [
-  {
-    id: 'amartya-prakash',
-    name: 'Amartya Prakash',
-    handle: '',
-    role: 'Junior Coordinator',
-    rollNo: 'BTECH/15259/25',
-    yearMajor: '',
-    tag: '',
-    discord: '',
-    imageUrl: '',
-  },
-  {
-    id: 'asmit-arya',
-    name: 'Asmit Arya',
-    handle: '',
-    role: 'Junior Coordinator',
-    rollNo: 'BTECH/15182/25',
-    yearMajor: '',
-    tag: '',
-    discord: '',
-    imageUrl: '',
-  },
+const committeeMember = (id: string, name: string, group: string, rollNo: string, role = group): ClubOfficer => ({
+  id,
+  name,
+  handle: '',
+  role,
+  group,
+  rollNo,
+  yearMajor: '',
+  tag: '',
+  discord: '',
+  imageUrl: '',
+});
+const committeeFallback: ClubOfficer[] = [
+  committeeMember('aayush-arya', 'Aayush Arya', 'Senior Coordinator', 'BTECH/15206/24'),
+  committeeMember('aayush-babu', 'Aayush Babu', 'Senior Coordinator', 'BTECH/15226/24'),
+  committeeMember('akshay-kumar-keshav', 'Akshay Kumar Keshav', 'Junior Coordinator', 'BTECH/15184/25'),
+  committeeMember('amartya-prakash', 'Amartya Prakash', 'Junior Coordinator', 'BTECH/15259/25'),
+  committeeMember('aryan-nirala', 'Aryan Nirala', 'Junior Coordinator', 'BTECH/15272/25'),
+  committeeMember('ashutosh-kumar', 'Ashutosh Kumar', 'Senior Coordinator', 'BTECH/15197/24'),
+  committeeMember('asmit-arya', 'Asmit Arya', 'Junior Coordinator', 'BTECH/15182/25'),
+  committeeMember('daksha-chandra', 'Daksha Chandra', 'Junior Coordinator', 'IMH/15008/25'),
+  committeeMember('hridayesh', 'Hridayesh', 'Junior Coordinator', 'BTECH/15219/25'),
+  committeeMember('kshitij-tiwari', 'Kshitij Tiwari', 'Senior Coordinator', 'BTECH/15135/24'),
+  committeeMember('kumar-tanishq', 'Kumar Tanishq', 'Junior Coordinator', 'BTECH/15271/25'),
+  committeeMember('nipun-sinha', 'Nipun Sinha', 'Senior Coordinator', 'BTECH/15217/24'),
+  committeeMember('suryansh-garg', 'Suryansh Garg', 'Junior Coordinator', 'IMH/15017/25'),
+  committeeMember('saumya-kumari', 'Saumya Kumari', 'Core Executive', 'BTECH/15014/23', 'Manager'),
+  committeeMember('kalpana-sangwan', 'Kalpana Sangwan', 'Core Executive', 'BTECH/15031/23', 'Design Head'),
+  committeeMember('sneha-sharan', 'Sneha Sharan', 'Core Executive', 'BTECH/15126/23', 'Public Relations Head'),
 ];
 
 function officerPhoto(officer: ClubOfficer) {
@@ -119,9 +125,69 @@ function OfficerCarousel({ title, officers }: { title: string; officers: ClubOff
   );
 }
 
+function CoreExecutiveGrid({ officers }: { officers: ClubOfficer[] }) {
+  const leadership = officers
+    .filter((officer) => ['manager', 'co-manager'].includes(officer.role.trim().toLowerCase()))
+    .sort((left, right) => {
+      const order = (role: string) => role.trim().toLowerCase() === 'manager' ? 0 : 1;
+      return order(left.role) - order(right.role) || left.name.localeCompare(right.name, 'en', { sensitivity: 'base' });
+    });
+  const heads = officers
+    .filter((officer) => !['manager', 'co-manager'].includes(officer.role.trim().toLowerCase()))
+    .sort((left, right) => left.name.localeCompare(right.name, 'en', { sensitivity: 'base' }));
+
+  return (
+    <section className="space-y-4">
+      <div className="border-b border-[#33343b] pb-3">
+        <h3 className="font-headline-md uppercase text-white">Core Executive</h3>
+      </div>
+      {officers.length === 0 ? (
+        <p className="border border-[#33343b] bg-[#0c0e14] p-5 text-sm text-[#8f96a3]">
+          No Core Executive profiles have been added yet.
+        </p>
+      ) : (
+        <div className="space-y-8">
+          {leadership.length > 0 && (
+            <div className="mx-auto grid max-w-2xl grid-cols-1 gap-6 sm:grid-cols-2">
+              {leadership.map((officer) => <CoreExecutiveCard key={officer.id} officer={officer} />)}
+            </div>
+          )}
+          {heads.length > 0 && (
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {heads.map((officer) => <CoreExecutiveCard key={officer.id} officer={officer} />)}
+            </div>
+          )}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function CoreExecutiveCard({ officer }: { officer: ClubOfficer }) {
+  return (
+    <article className="border border-[#33343b] bg-[#191b22]">
+      <div className="relative aspect-[4/5] overflow-hidden bg-[#111319]">
+        <Image
+          src={officerPhoto(officer)}
+          alt={officer.name}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 384px"
+          unoptimized
+          className="object-contain"
+        />
+      </div>
+      <div className="min-h-24 border-t border-[#33343b] p-3 sm:p-4">
+        <h4 className="truncate font-headline-sm uppercase text-white">{officer.name}</h4>
+        <p className="mt-1 truncate font-label-mono-sm text-xs uppercase text-[#cdf200]">{officer.role}</p>
+        <p className="mt-1 truncate text-xs text-[#8f96a3]">Roll No: {officer.rollNo}</p>
+      </div>
+    </article>
+  );
+}
+
 export default function AboutPage() {
   const { playTacticalSound } = useEsportsModal();
-  const [officers, setOfficers] = useState<ClubOfficer[]>(additionalJuniorCoordinators);
+  const [officers, setOfficers] = useState<ClubOfficer[]>(committeeFallback);
 
   useEffect(() => {
     let active = true;
@@ -130,14 +196,18 @@ export default function AboutPage() {
         if (!response.ok) throw new Error('Unable to load committee information.');
         const data = await response.json();
         if (active && Array.isArray(data.officers)) {
-          const existingNames = new Set(
-            (data.officers as ClubOfficer[]).map((officer) => officer.name.trim().toLocaleLowerCase('en'))
-          );
+          const databaseOfficers = data.officers as ClubOfficer[];
+          const databaseNames = new Set(databaseOfficers.map((officer) => officer.name.trim().toLocaleLowerCase('en')));
           setOfficers([
-            ...(data.officers as ClubOfficer[]),
-            ...additionalJuniorCoordinators.filter(
-              (officer) => !existingNames.has(officer.name.toLocaleLowerCase('en'))
-            ),
+            ...databaseOfficers.map((officer) => ({
+              ...officer,
+              group: officer.group ?? (
+                ['President', 'Senior Coordinator', 'Junior Coordinator'].includes(officer.role)
+                  ? officer.role
+                  : 'Senior Coordinator'
+              ),
+            })),
+            ...committeeFallback.filter((officer) => !databaseNames.has(officer.name.toLocaleLowerCase('en'))),
           ]);
         }
       })
@@ -251,9 +321,9 @@ export default function AboutPage() {
         </div>
 
         <div className="space-y-10">
-          <OfficerCarousel title="President" officers={officers.filter((officer) => officer.role.trim().toLowerCase() === 'president')} />
-          <OfficerCarousel title="Senior Coordinator" officers={officers.filter((officer) => officer.role.trim().toLowerCase() === 'senior coordinator')} />
-          <OfficerCarousel title="Junior Coordinator" officers={officers.filter((officer) => officer.role.trim().toLowerCase() === 'junior coordinator')} />
+          <CoreExecutiveGrid officers={officers.filter((officer) => officer.group.trim().toLowerCase() === 'core executive')} />
+          <OfficerCarousel title="Senior Coordinator" officers={officers.filter((officer) => officer.group.trim().toLowerCase() === 'senior coordinator')} />
+          <OfficerCarousel title="Junior Coordinator" officers={officers.filter((officer) => officer.group.trim().toLowerCase() === 'junior coordinator')} />
         </div>
       </section>
 

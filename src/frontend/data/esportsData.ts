@@ -71,6 +71,7 @@ export interface ClubOfficer {
   name: string;
   handle: string;
   role: string;
+  group: string;
   rollNo: string;
   yearMajor: string;
   tag: string;
@@ -83,6 +84,7 @@ export const CLUB_OFFICER_PHOTOS: Record<string, string> = {
   'aayush arya': '/resources/people/aayush-arya-senior-coordinator.webp',
   'aayush babu': '/resources/people/aayush-babu-senior-coordinator.webp',
   'akshay kumar keshav': '/resources/people/akshay-kumar-keshav-junior-coordinator.webp',
+  'ashutosh kumar': '/resources/people/ashutosh-kumar-senior-coordinator.webp',
   'amartya prakash': '/resources/people/amartya-prakash-junior-coordinator.webp',
   'asmit arya': '/resources/people/asmit-arya-junior-coordinator.webp',
   'aryan nirala': '/resources/people/aryan-nirala-junior-coordinator.webp',
@@ -90,7 +92,11 @@ export const CLUB_OFFICER_PHOTOS: Record<string, string> = {
   hridayesh: '/resources/people/hridayesh-junior-coordinator.webp',
   'kshitij tiwari': '/resources/people/kshitij-tiwari-senior-coordinator.webp',
   'kumar tanishq': '/resources/people/kumar-tanishq-junior-coordinator.webp',
+  'nipun sinha': '/resources/people/nipun-sinha-senior-coordinator.webp',
   'suryansh garg': '/resources/people/suryansh-garg-junior-coordinator.webp',
+  'saumya kumari': '/resources/people/saumya-kumari-manager.webp',
+  'kalpana sangwan': '/resources/people/kalpana-sangwan-design-head.webp',
+  'sneha sharan': '/resources/people/sneha-sharan-public-relations-head.webp',
 };
 
 export interface ClubTeamMember {

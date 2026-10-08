@@ -11,6 +11,8 @@ import {
   safeServerError,
 } from "@/lib/api";
 
+const OFFICER_GROUPS = ["President", "Core Executive", "Senior Coordinator", "Junior Coordinator"];
+
 export async function GET(request: Request) {
   const authorization = await requireAdmin(request);
   if (authorization) return authorization;
@@ -25,6 +27,9 @@ export async function GET(request: Request) {
       success: true,
       officers: officers.map((officer) => ({
         ...officer,
+        group: OFFICER_GROUPS.includes(officer.role) && officer.group === "Senior Coordinator"
+          ? officer.role
+          : officer.group,
         photoUrl: photoUpdatedAt.has(officer.id)
           ? `/api/officers/${officer.id}/photo?v=${photoUpdatedAt.get(officer.id)}`
           : null,
@@ -53,12 +58,13 @@ function officerData(body: Record<string, unknown>, partial = false) {
     }
     data.rollNo = `${parts[0].toUpperCase()}/${parts[1]}/${parts[2]}`;
   }
-  if (body.role !== undefined || !partial) {
-    const role = requiredText(body.role, "Post", 100);
-    if (!["President", "Senior Coordinator", "Junior Coordinator"].includes(role)) {
-      throw new ApiInputError("Post must be President, Senior Coordinator, or Junior Coordinator.");
+  if (body.role !== undefined || !partial) data.role = requiredText(body.role, "Post", 100);
+  if (body.group !== undefined || !partial) {
+    const group = requiredText(body.group, "Committee section", 40);
+    if (!OFFICER_GROUPS.includes(group)) {
+      throw new ApiInputError(`Committee section must be one of: ${OFFICER_GROUPS.join(", ")}.`);
     }
-    data.role = role;
+    data.group = group;
   }
   if (body.order !== undefined || !partial) data.order = optionalInteger(body.order, "Display order", 0, 0, 10_000);
   return data;

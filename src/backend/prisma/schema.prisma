@@ -162,6 +162,7 @@ model Officer {
   name      String
   handle    String
   role      String
+  group     String   @default("Senior Coordinator")
   rollNo    String   @default("")
   yearMajor String
   tag       String

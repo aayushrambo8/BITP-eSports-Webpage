@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+const OFFICER_GROUPS = ["President", "Core Executive", "Senior Coordinator", "Junior Coordinator"];
+
 export async function GET() {
   try {
     const officers = await prisma.officer.findMany({
@@ -16,6 +18,9 @@ export async function GET() {
       success: true,
       officers: officers.map((officer) => ({
         ...officer,
+        group: OFFICER_GROUPS.includes(officer.role) && officer.group === "Senior Coordinator"
+          ? officer.role
+          : officer.group,
         photoUrl: photoUpdatedAt.has(officer.id)
           ? `/api/officers/${officer.id}/photo?v=${photoUpdatedAt.get(officer.id)}`
           : null,
