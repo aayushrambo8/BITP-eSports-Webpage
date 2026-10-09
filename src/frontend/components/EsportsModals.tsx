@@ -856,7 +856,7 @@ END:VCALENDAR`;
                     AUTHENTICATE & ENTER
                   </button>
                   <a
-                    href="https://discord.gg/apexesports"
+                    href="https://discord.gg/bitpesports"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full sm:w-auto text-center border border-[#33343b] hover:border-[#cdf200] text-[#e2e2ea] font-label-caps px-6 py-3 uppercase text-sm"

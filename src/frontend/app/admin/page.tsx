@@ -43,7 +43,8 @@ const resources: Record<ResourceKey, Resource> = {
     fields: [
       { name: 'title', label: 'Event title', required: true },
       { name: 'dateStr', label: 'Date label', required: true },
-      { name: 'timeStr', label: 'Time', required: true },
+      { name: 'timeStr', label: 'Start time', required: true },
+      { name: 'endTimeStr', label: 'End time (e.g. 20:00)' },
       { name: 'isoDate', label: 'Date and time', type: 'datetime-local', required: true },
       { name: 'discipline', label: 'Game / discipline', required: true },
       { name: 'location', label: 'Location', required: true },
@@ -949,7 +950,8 @@ export default function AdminPage() {
             {entries.map((entry, index) => {
               const id = typeof entry.id === 'string' ? entry.id : '';
               const title = String(entry.title ?? entry.name ?? entry.discipline ?? entry.tag ?? `Item ${index + 1}`);
-              const summary = String(entry.dateStr ?? entry.datetime ?? entry.time ?? entry.role ?? entry.league ?? '');
+              const timeInfo = entry.timeStr ? (entry.endTimeStr ? `${entry.timeStr} - ${entry.endTimeStr}` : String(entry.timeStr)) : null;
+              const summary = entry.dateStr ? (timeInfo ? `${entry.dateStr} • ${timeInfo}` : String(entry.dateStr)) : String(entry.datetime ?? entry.time ?? entry.role ?? entry.league ?? '');
               return (
                 <article key={id || index} className="border border-[#33343b] bg-[#0c0e14] p-4">
                   <div className="flex flex-wrap items-start justify-between gap-3">

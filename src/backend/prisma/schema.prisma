@@ -65,6 +65,7 @@ model Event {
   title       String
   dateStr     String
   timeStr     String
+  endTimeStr  String?
   isoDate     DateTime
   discipline  String
   location    String

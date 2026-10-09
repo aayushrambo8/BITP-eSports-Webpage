@@ -45,6 +45,7 @@ function eventData(body: Record<string, unknown>, partial = false) {
     title?: string;
     dateStr?: string;
     timeStr?: string;
+    endTimeStr?: string | null;
     isoDate?: Date;
     discipline?: string;
     location?: string;
@@ -85,6 +86,9 @@ function eventData(body: Record<string, unknown>, partial = false) {
     }
   }
 
+  if (body.endTimeStr !== undefined || !partial) {
+    data.endTimeStr = optionalText(body.endTimeStr, "End time", 80) ?? null;
+  }
   if (body.isoDate !== undefined || !partial) {
     data.isoDate = requiredDate(body.isoDate, "Event date");
   }

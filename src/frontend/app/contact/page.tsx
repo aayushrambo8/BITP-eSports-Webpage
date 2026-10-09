@@ -156,7 +156,9 @@ export default function ContactPage() {
                     rel="noopener noreferrer"
                     className="text-[#8f96a3] hover:text-[#cdf200] text-xs font-label-mono-sm"
                   >
-                    VISIT PROFILE
+                    <span className="font-label-mono-sm text-[#0c0e14] bg-[#cdf200] font-bold px-1.5 py-0.5 text-[10px]">
+                    FASTEST RESPONSE
+                  </span>
                   </a>
                 </div>
                 <a
@@ -179,9 +181,6 @@ export default function ContactPage() {
                     <MessageSquare className="w-3.5 h-3.5" />
                     <span>DISCORD SERVER</span>
                   </span>
-                  <span className="font-label-mono-sm text-[#0c0e14] bg-[#cdf200] font-bold px-1.5 py-0.5 text-[10px]">
-                    FASTEST RESPONSE
-                  </span>
                 </div>
                 <a
                   className="font-headline-sm text-white hover:text-[#cdf200] transition-colors block mt-1"
@@ -189,7 +188,7 @@ export default function ContactPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  discord.gg/apexesports
+                  discord.gg/bitpesports.gg
                 </a>
                 <span className="font-body-sm text-[#8f96a3] mt-1 block text-xs">
                   Live team scrim coordination, student chats, LFG lobbies

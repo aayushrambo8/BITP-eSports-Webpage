@@ -4,15 +4,16 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEsportsModal } from '@/context/ModalContext';
-import { 
+import {
   CONTACT_INFO,
   DEFAULT_CLUB_GAMES,
   LOCAL_GAME_ART, localResourceImage,
   type ClubGame, type ScheduledMatch, type WeeklyScheduleItem, type RecentResult, type TournamentEvent,
+  formatEventTime, isEventEndedIST,
 } from '@/data/esportsData';
-import { 
-  ArrowRight, Calendar, Video, MessageSquare, Mail, 
-  ExternalLink, Trophy, Users, Shield, Tv, Clock, Radio, AlertCircle, Gamepad2, Flame, Crosshair, Crown 
+import {
+  ArrowRight, Calendar, Video, MessageSquare, Mail,
+  ExternalLink, Trophy, Users, Shield, Tv, Clock, Radio, AlertCircle, Gamepad2, Flame, Crosshair, Crown
 } from 'lucide-react';
 
 export default function Home() {
@@ -49,9 +50,9 @@ export default function Home() {
     };
   }, []);
 
-  const nearestEvent = [...events].sort(
-    (left, right) => new Date(left.isoDate).getTime() - new Date(right.isoDate).getTime()
-  )[0] ?? null;
+  const nearestEvent = [...events]
+    .filter((e) => !isEventEndedIST(e))
+    .sort((left, right) => new Date(left.isoDate).getTime() - new Date(right.isoDate).getTime())[0] ?? null;
 
   return (
     <main className="flex-grow w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-12 space-y-16 my-8">
@@ -173,7 +174,7 @@ export default function Home() {
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 py-4 border-t border-b border-[#262a36]">
                 <div>
                   <div className="font-label-mono-sm text-[#94a3b8] uppercase text-xs">Date & Time</div>
-                  <div className="font-label-mono-lg font-bold text-white">{nearestEvent.dateStr} • {nearestEvent.timeStr}</div>
+                  <div className="font-label-mono-lg font-bold text-white">{nearestEvent.dateStr} • {formatEventTime(nearestEvent)}</div>
                 </div>
                 <div>
                   <div className="font-label-mono-sm text-[#94a3b8] uppercase text-xs">Location</div>
@@ -260,7 +261,7 @@ export default function Home() {
                   className="w-full h-full object-cover grayscale contrast-125 opacity-40 group-hover:scale-105 group-hover:opacity-60 transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#12141a] via-[#12141a]/60 to-transparent"></div>
-                
+
                 {/* Top Badges */}
                 <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-10">
                   <span

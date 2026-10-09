@@ -40,8 +40,11 @@ const committeeFallback: ClubOfficer[] = [
   committeeMember('nipun-sinha', 'Nipun Sinha', 'Senior Coordinator', 'BTECH/15217/24'),
   committeeMember('suryansh-garg', 'Suryansh Garg', 'Junior Coordinator', 'IMH/15017/25'),
   committeeMember('saumya-kumari', 'Saumya Kumari', 'Core Executive', 'BTECH/15014/23', 'Manager'),
+  committeeMember('kishlaya-sinha', 'Kishlaya Sinha', 'Core Executive', 'BTECH/15001/23', 'Co-Manager'),
   committeeMember('kalpana-sangwan', 'Kalpana Sangwan', 'Core Executive', 'BTECH/15031/23', 'Design Head'),
   committeeMember('sneha-sharan', 'Sneha Sharan', 'Core Executive', 'BTECH/15126/23', 'Public Relations Head'),
+  committeeMember('nidhi-sinha', 'Nidhi Sinha', 'Core Executive', 'BTECH/15197/23', 'Human Resource Head'),
+  committeeMember('pratik-raj', 'Pratik Raj', 'Core Executive', 'BTECH/15189/23', 'Event Head'),
 ];
 
 function officerPhoto(officer: ClubOfficer) {
@@ -153,7 +156,7 @@ function CoreExecutiveGrid({ officers }: { officers: ClubOfficer[] }) {
             </div>
           )}
           {heads.length > 0 && (
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {heads.map((officer) => <CoreExecutiveCard key={officer.id} officer={officer} />)}
             </div>
           )}

@@ -53,6 +53,7 @@ export interface TournamentEvent {
   title: string;
   dateStr: string;
   timeStr: string;
+  endTimeStr?: string | null;
   isoDate: string;
   discipline: string;
   location: string;
@@ -64,6 +65,95 @@ export interface TournamentEvent {
   posterUrl?: string | null;
   slotsFilled?: number;
   slotsTotal?: number;
+}
+
+export function formatEventTime(event: { timeStr: string; endTimeStr?: string | null }): string {
+  if (!event.endTimeStr) return event.timeStr;
+  return `${event.timeStr} - ${event.endTimeStr}`;
+}
+
+export function parseTimeString(timeStr: string): { hours: number; minutes: number } | null {
+  if (!timeStr) return null;
+  const cleaned = timeStr.trim();
+  const match24 = cleaned.match(/^(\d{1,2}):(\d{2})$/);
+  if (match24) {
+    return { hours: parseInt(match24[1], 10), minutes: parseInt(match24[2], 10) };
+  }
+  const match12 = cleaned.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
+  if (match12) {
+    let hours = parseInt(match12[1], 10);
+    const minutes = match12[2] ? parseInt(match12[2], 10) : 0;
+    const period = match12[3].toUpperCase();
+    if (period === 'PM' && hours < 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    return { hours, minutes };
+  }
+  return null;
+}
+
+export function isEventEndedIST(event: TournamentEvent, now: Date = new Date()): boolean {
+  if (
+    event.statusBadge?.toUpperCase() === 'COMPLETED' ||
+    event.statusBadge?.toUpperCase() === 'ARCHIVED'
+  ) {
+    return true;
+  }
+  const nowMs = now.getTime();
+  const startDate = new Date(event.isoDate);
+  if (isNaN(startDate.getTime())) return false;
+
+  if (event.endTimeStr) {
+    const endParsed = parseTimeString(event.endTimeStr);
+    if (endParsed) {
+      const options: Intl.DateTimeFormatOptions = {
+        timeZone: 'Asia/Kolkata',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      };
+      const formatter = new Intl.DateTimeFormat('en-CA', options);
+      const dateParts = formatter.format(startDate);
+
+      const pad = (n: number) => n.toString().padStart(2, '0');
+      const istEndIso = `${dateParts}T${pad(endParsed.hours)}:${pad(endParsed.minutes)}:00+05:30`;
+      const endDate = new Date(istEndIso);
+
+      if (!isNaN(endDate.getTime())) {
+        const startParsed = parseTimeString(event.timeStr);
+        if (
+          startParsed &&
+          (endParsed.hours < startParsed.hours ||
+            (endParsed.hours === startParsed.hours && endParsed.minutes < startParsed.minutes))
+        ) {
+          endDate.setDate(endDate.getDate() + 1);
+        }
+        return endDate.getTime() <= nowMs;
+      }
+    }
+  }
+
+  const startParsed = parseTimeString(event.timeStr);
+  if (startParsed) {
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'Asia/Kolkata',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    };
+    const formatter = new Intl.DateTimeFormat('en-CA', options);
+    const dateParts = formatter.format(startDate);
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    const endHour = (startParsed.hours + 2) % 24;
+    const dayAdd = startParsed.hours + 2 >= 24 ? 1 : 0;
+    const istEndIso = `${dateParts}T${pad(endHour)}:${pad(startParsed.minutes)}:00+05:30`;
+    const endDate = new Date(istEndIso);
+    if (dayAdd > 0) endDate.setDate(endDate.getDate() + 1);
+    if (!isNaN(endDate.getTime())) {
+      return endDate.getTime() <= nowMs;
+    }
+  }
+
+  return startDate.getTime() <= nowMs;
 }
 
 export interface ClubOfficer {
@@ -89,7 +179,7 @@ export const CLUB_OFFICER_PHOTOS: Record<string, string> = {
   'asmit arya': '/resources/people/asmit-arya-junior-coordinator.webp',
   'aryan nirala': '/resources/people/aryan-nirala-junior-coordinator.webp',
   'daksha chandra': '/resources/people/daksha-chandra-junior-coordinator.webp',
-  hridayesh: '/resources/people/hridayesh-junior-coordinator.webp',
+  'hridayesh': '/resources/people/hridayesh-junior-coordinator.webp',
   'kshitij tiwari': '/resources/people/kshitij-tiwari-senior-coordinator.webp',
   'kumar tanishq': '/resources/people/kumar-tanishq-junior-coordinator.webp',
   'nipun sinha': '/resources/people/nipun-sinha-senior-coordinator.webp',
@@ -97,6 +187,9 @@ export const CLUB_OFFICER_PHOTOS: Record<string, string> = {
   'saumya kumari': '/resources/people/saumya-kumari-manager.webp',
   'kalpana sangwan': '/resources/people/kalpana-sangwan-design-head.webp',
   'sneha sharan': '/resources/people/sneha-sharan-public-relations-head.webp',
+  'kishlaya sinha': '/resources/people/kishlaya-sinha-comanager.webp',
+  'nidhi sinha':'/resources/people/nidhi-sinha-human-resource-manager.webp',
+  'pratik raj':'pratik-raj-event-head.webp',
 };
 
 export interface ClubTeamMember {
@@ -229,7 +322,7 @@ export function localResourceImage(value: string | null | undefined, fallback: s
 // CONTACT TOUCHPOINTS
 // -------------------------------------------------------------
 export const CONTACT_INFO = {
-  instagramHandle: '@BITPeSports',
+  instagramHandle: '@BITPeSports.GG',
   instagramUrl: 'https://www.instagram.com/bitpesports.gg/',
   mail: 'bitpesports.gg@gmail.com',
   scrimsMail: 'bitpesports.gg@gmail.com',
