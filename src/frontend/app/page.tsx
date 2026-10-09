@@ -251,14 +251,14 @@ export default function Home() {
               className="border border-[#262a36] bg-[#12141a] relative overflow-hidden group hover:border-[#3b4252] transition-colors duration-200 flex flex-col justify-between"
             >
               {/* Top Banner Image with Gradient Overlay */}
-              <div className="relative h-48 bg-[#0c0e14] overflow-hidden">
+              <div className="relative aspect-[4/3] bg-[#0c0e14] overflow-hidden">
                 <Image
                   src={LOCAL_GAME_ART[game.id] ?? localResourceImage(game.gameArt, '/resources/games/default.svg')}
                   alt={game.name}
                   fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes="(max-width: 1200px) 100vw, 50vw"
                   unoptimized
-                  className="w-full h-full object-cover grayscale contrast-125 opacity-40 group-hover:scale-105 group-hover:opacity-60 transition-all duration-500"
+                  className="w-full h-full object-contain grayscale contrast-125 opacity-40 group-hover:scale-105 group-hover:opacity-60 transition-all duration-500"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#12141a] via-[#12141a]/60 to-transparent"></div>
 
@@ -297,24 +297,11 @@ export default function Home() {
                   </p>
                 </div>
 
-                <div className="pt-4 space-y-1.5 border-t border-[#262a36] font-label-mono-sm text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-[#94a3b8]">Division:</span>
-                    <span className="text-white font-semibold">{game.divisionBadge}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#94a3b8]">Practice:</span>
-                    <span className="text-white">{game.practiceSchedule}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#94a3b8]">League Tag:</span>
-                    <span className="font-semibold" style={{ color: game.accentColor }}>
-                      {game.league}
-                    </span>
-                  </div>
-                </div>
+
+                
               </div>
             </div>
+
           ))}
         </div>
       </section>
@@ -499,6 +486,6 @@ export default function Home() {
           </Link>
         </div>
       </section>
-    </main>
+    </main >
   );
 }

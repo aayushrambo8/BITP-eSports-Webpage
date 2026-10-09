@@ -237,10 +237,10 @@ export const ABOUT_PAGE_ASSETS = {
 };
 
 export const LOCAL_GAME_ART: Record<string, string> = {
-  'ea-fc': '/resources/games/eafc.svg',
-  valorant: '/resources/games/valorant.svg',
-  'free-fire': '/resources/games/free-fire.svg',
-  bgmi: '/resources/games/bgmi.svg',
+  'ea-fc': '/resources/games/FC.webp',
+  valorant: '/resources/games/Valorant.webp',
+  'free-fire': '/resources/games/FreeFire.webp',
+  bgmi: '/resources/games/BGMI.webp',
 };
 
 export const DEFAULT_CLUB_GAMES: ClubGame[] = [
