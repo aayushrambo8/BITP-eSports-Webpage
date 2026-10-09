@@ -171,8 +171,10 @@ export interface ClubOfficer {
 export const CLUB_OFFICER_PHOTOS: Record<string, string> = {
   'aayush arya': '/resources/people/aayush-arya-senior-coordinator.webp',
   'aayush babu': '/resources/people/aayush-babu-senior-coordinator.webp',
+  'aditi mahror': '/resources/people/aditi-mahror-senior-coordinator.webp',
   'akshay kumar keshav': '/resources/people/akshay-kumar-keshav-junior-coordinator.webp',
   'ashutosh kumar': '/resources/people/ashutosh-kumar-senior-coordinator.webp',
+  'armaan sinha': '/resources/people/armaan-sinha-junior-coordinator.webp',
   'amartya prakash': '/resources/people/amartya-prakash-junior-coordinator.webp',
   'asmit arya': '/resources/people/asmit-arya-junior-coordinator.webp',
   'aryan nirala': '/resources/people/aryan-nirala-junior-coordinator.webp',
@@ -186,7 +188,8 @@ export const CLUB_OFFICER_PHOTOS: Record<string, string> = {
   'kalpana sangwan': '/resources/people/kalpana-sangwan-design-head.webp',
   'sneha sharan': '/resources/people/sneha-sharan-public-relations-head.webp',
   'kishlaya sinha': '/resources/people/kishlaya-sinha-comanager.webp',
-  'pratik raj': '/resources/people/pratik-raj-event-head.webp'
+  'pratik raj': '/resources/people/pratik-raj-event-head.webp',
+  'nidhi sinha':'/resources/people/nidhi-sinha-human-resource-manager.webp',
 
 };
 
