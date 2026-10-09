@@ -189,7 +189,7 @@ export const CLUB_OFFICER_PHOTOS: Record<string, string> = {
   'sneha sharan': '/resources/people/sneha-sharan-public-relations-head.webp',
   'kishlaya sinha': '/resources/people/kishlaya-sinha-comanager.webp',
   'nidhi sinha':'/resources/people/nidhi-sinha-human-resource-manager.webp',
-  'pratik raj':'pratik-raj-event-head.webp',
+  'pratik raj':'/resources/people/pratik-raj-event-head.webp',
 };
 
 export interface ClubTeamMember {
