@@ -18,6 +18,10 @@
         "name": "next"
       }
     ],
+<<<<<<< HEAD
+=======
+    "baseUrl": ".",
+>>>>>>> origin/main
     "paths": {
       "@/lib/*": ["./src/backend/lib/*"],
       "@/backend/*": ["./src/backend/*"],

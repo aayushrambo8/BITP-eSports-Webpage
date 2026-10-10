@@ -103,7 +103,11 @@ The authenticated admin panel supports content management for events, game divis
 
 Events support an optional JPEG, PNG, or WebP poster up to 4 MB. The recommended image size is 1440×1350 pixels; other dimensions are accepted and displayed in the poster frame. Posters are stored in PostgreSQL alongside event records, so include the database in backups. Event descriptions preserve entered line breaks on public pages.
 
+<<<<<<< HEAD
 The **Committee & members** admin API supports committee profiles and optional uploaded photos (JPEG, PNG, or WebP, up to 4 MB); uploaded photos are stored in PostgreSQL with the committee record.
+=======
+The **Committee & members** section manages the About page team sections. Choose a section (President, Core Executive, Senior Coordinator, or Junior Coordinator) separately from the person’s post, so Core Executive members can have different posts. Core Executive profiles are displayed together as static cards, with the Manager first; coordinator sections use manual carousels. Add the person’s photo (JPEG, PNG, or WebP, up to 4 MB), name, and roll number; uploaded photos are stored in PostgreSQL with the committee record. The current About page also includes frontend-local committee portraits in `src/frontend/public/resources/people`.
+>>>>>>> origin/main
 
 To add a user, sign in at `/admin` as an `OWNER` or `ADMIN`, open **User accounts**, enter only the person's email address, choose a role if you are an Owner (Admins can only invite Moderators), and select **Send invitation**. Invitation email must be configured with Resend. The person follows the single-use email link to choose their own display name, unique username, and password. They can sign in using either their email or username. Admins can change their display name and username under **My profile**; activity records identify the username.
 
@@ -111,7 +115,11 @@ Roles are enforced by server-side API authorization. `MODERATOR` can create, edi
 
 ## Frontend image assets
 
+<<<<<<< HEAD
 The frontend's original cyberpunk artwork, scroll-parallax background, and intro video are stored under `src/frontend/public/art`. Event posters uploaded through the backend remain database-managed; legacy club logos, game art, campus photos, and portraits are not bundled with the frontend.
+=======
+Frontend images are stored locally under `src/frontend/public/resources` and served from `/resources/...`; the site does not fetch the displayed photos or game artwork from remote image hosts. Committee portraits used by the About page are under `src/frontend/public/resources/people`. Add future frontend image assets to this folder and reference them with a `/resources/...` path.
+>>>>>>> origin/main
 
 Public content endpoints are read-only. All content mutations use same-origin admin API routes protected by the signed, HTTP-only admin session cookie. Contact submissions are saved in the database and are not publicly readable.
 

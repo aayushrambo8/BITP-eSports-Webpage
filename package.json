@@ -6,7 +6,11 @@
     "dev": "next dev src/frontend",
     "build": "npm run db:generate && next build src/frontend",
     "start": "next start src/frontend",
+<<<<<<< HEAD
     "lint": "eslint src/frontend/app src/frontend/components src/frontend/data src/backend",
+=======
+    "lint": "eslint src/frontend/app src/frontend/components src/frontend/context src/frontend/data src/backend",
+>>>>>>> origin/main
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate --schema src/backend/prisma/schema.prisma",
     "db:push": "prisma db push --schema src/backend/prisma/schema.prisma && npm run admin:backfill-usernames",

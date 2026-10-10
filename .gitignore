@@ -9,7 +9,10 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+<<<<<<< HEAD
 .BITP-eSports-Webpag
+=======
+>>>>>>> origin/main
 
 # testing
 /coverage
@@ -42,7 +45,10 @@ yarn-error.log*
 /database/*.bak
 /.idea/
 /.Picture
+<<<<<<< HEAD
 /.BITP-eSports-Webpage/
+=======
+>>>>>>> origin/main
 
 # vercel
 .vercel
