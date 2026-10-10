@@ -1,0 +1,232 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model AdminUser {
+  id                 String               @id @default(uuid())
+  email              String               @unique
+  username           String?              @unique
+  name               String
+  password           String
+  role               String               @default("MODERATOR")
+  isActive           Boolean              @default(true)
+  mustSetPassword    Boolean              @default(false)
+  authVersion        Int                  @default(0)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  passwordResetTokens PasswordResetToken[]
+}
+
+model AdminActivity {
+  id         String   @id @default(uuid())
+  actorId    String
+  actorUsername String?
+  actorName  String
+  actorEmail String
+  action     String
+  entity     String
+  entityId   String?
+  itemLabel  String
+  createdAt  DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+}
+
+model AuthRateLimit {
+  key             String   @id
+  windowStartedAt DateTime
+  count           Int
+  updatedAt       DateTime @updatedAt
+
+  @@index([windowStartedAt])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique
+  purpose   String
+  userId    String
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      AdminUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose, expiresAt])
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  title       String
+  dateStr     String
+  timeStr     String
+  endTimeStr  String?
+  isoDate     DateTime
+  discipline  String
+  location    String
+  locationSub String
+  format      String
+  formatSub   String
+  statusBadge String
+  description String?
+  slotsFilled Int?     @default(0)
+  slotsTotal  Int?     @default(64)
+  isSpotlight Boolean  @default(false)
+  poster      EventPoster?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isoDate])
+}
+
+model EventPoster {
+  id        String   @id @default(uuid())
+  eventId   String   @unique
+  data      Bytes
+  mimeType  String
+  updatedAt DateTime @updatedAt
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model Match {
+  id         String   @id @default(uuid())
+  discipline String
+  datetime   String
+  isoDate    DateTime
+  opponent   String
+  league     String
+  streamType String   @default("Live Broadcast")
+  streamUrl  String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([isoDate])
+}
+
+model WeeklySession {
+  id        String   @id @default(uuid())
+  tag       String
+  title     String
+  time      String
+  location  String
+  details   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model Result {
+  id         String   @id @default(uuid())
+  discipline String
+  league     String
+  badge      String   @default("WIN")
+  team1      String
+  score1     String
+  team2      String
+  score2     String
+  subtext    String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([createdAt])
+}
+
+model GameTitle {
+  id               String   @id @default(uuid())
+  slug             String   @unique
+  name             String
+  tag              String
+  divisionBadge    String
+  category         String
+  description      String
+  captain          String
+  practiceSchedule String
+  status           String
+  statusType       String   @default("active")
+  league           String
+  accentColor      String   @default("#88c425")
+  badgeBg          String   @default("rgba(136, 196, 37, 0.15)")
+  gameArt          String
+  tagline          String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Officer {
+  id        String   @id @default(uuid())
+  name      String
+  handle    String
+  role      String
+  group     String   @default("Senior Coordinator")
+  rollNo    String   @default("")
+  yearMajor String
+  tag       String
+  discord   String
+  imageUrl  String
+  order     Int      @default(0)
+  photo     OfficerPhoto?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+}
+
+model OfficerPhoto {
+  id        String   @id @default(uuid())
+  officerId String   @unique
+  data      Bytes
+  mimeType  String
+  updatedAt DateTime @updatedAt
+  officer   Officer  @relation(fields: [officerId], references: [id], onDelete: Cascade)
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  name      String
+  handle    String
+  role      String
+  gameSlug  String
+  yearMajor String
+  tag       String
+  imageUrl  String   @default("")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([gameSlug, order])
+}
+
+model Achievement {
+  id          String   @id @default(uuid())
+  title       String
+  game        String
+  award       String
+  date        DateTime
+  description String
+  imageUrl    String   @default("")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([date])
+}
+
+model ContactSubmission {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  topic     String?
+  game      String?
+  message   String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([email, createdAt])
+}

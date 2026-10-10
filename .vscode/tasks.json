@@ -1,0 +1,28 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Start Next.js Frontend",
+			"type": "shell",
+			"command": "C:\\Program Files\\nodejs\\npm.cmd",
+			"args": [
+				"run",
+				"dev"
+			],
+			"options": {
+				"env": {
+					"PATH": "C:\\Program Files\\nodejs;${env:PATH}"
+				}
+			},
+			"isBackground": true,
+			"problemMatcher": {
+				"base": "$tsc-watch",
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": ".*",
+					"endsPattern": "Ready in"
+				}
+			}
+		}
+	]
+}

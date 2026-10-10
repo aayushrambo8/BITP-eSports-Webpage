@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 500" fill="none">
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#16192b"/><stop offset=".55" stop-color="#241b32"/><stop offset="1" stop-color="#0b0d14"/></linearGradient>
+    <linearGradient id="glass" x2="0" y2="1"><stop stop-color="#1e3a53"/><stop offset="1" stop-color="#111522"/></linearGradient>
+    <linearGradient id="sign" x2="1"><stop stop-color="#ff315f"/><stop offset="1" stop-color="#13e8f6"/></linearGradient>
+    <filter id="glow"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+  <path fill="url(#bg)" d="M0 0h900v500H0z"/>
+  <circle cx="697" cy="154" r="125" fill="#08e6f4" opacity=".12" filter="url(#glow)"/>
+  <path d="M0 357 73 277l47 28 54-115 46 31 45-87 48 21 35-68 54 38 42-66 53 43 47-83 50 47 42-69 47 50 45-21 77 82v412H0z" fill="#1d2032"/>
+  <path d="M49 338V181h107v157m29 0V125h133v213m31 0V203h97v135m28 0V106h146v232m31 0V168h117v170m38 0V131h105v207" fill="url(#glass)" stroke="#344258" stroke-width="3"/>
+  <g stroke="#16e9f7" stroke-width="4" opacity=".82"><path d="M71 207h25m-25 28h25m-25 28h25m65-91h29m-29 33h29m-29 33h29m145-8h24m-24 31h24m205-117h30m-30 34h30m-30 35h30m132-6h29m-29 32h29m102-63h25m-25 31h25"/></g>
+  <path d="M0 370h900v130H0z" fill="#0d1019"/>
+  <path d="M172 310h548v134H172z" rx="4" fill="#10141f" stroke="url(#sign)" stroke-width="4"/>
+  <path d="M201 339h490v75H201z" fill="#171b29" stroke="#384456"/>
+  <path d="M223 358h180m-180 23h119m213-23h102m-102 23h73" stroke="#19e7f5" stroke-width="4"/>
+  <circle cx="661" cy="378" r="11" fill="#ff345f"/>
+  <path d="M0 462h900" stroke="#ff315f" stroke-opacity=".55"/>
+  <text x="450" y="303" fill="#fff" font-family="monospace" font-size="16" font-weight="700" letter-spacing="8" text-anchor="middle">SIGNAL // CONNECT</text>
+  <text x="47" y="474" fill="#a8bbc8" font-family="monospace" font-size="12" letter-spacing="5">XORDIUM 05  •  RANCHI AFTER HOURS</text>
+</svg>
