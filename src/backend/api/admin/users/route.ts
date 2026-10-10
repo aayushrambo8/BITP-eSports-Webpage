@@ -7,6 +7,7 @@ import { isAdminPasswordEmailConfigured, sendAdminPasswordEmail } from "@/lib/ad
 import {
   ApiInputError,
   inputErrorResponse,
+  optionalText,
   readJsonObject,
   requestIdentifier,
   requiredText,
@@ -50,6 +51,7 @@ export async function POST(request: Request) {
     const email = requiredText(body.email, "Email", 254).toLowerCase();
     const name = email.split("@")[0].slice(0, 100) || "Invited user";
     const role = requiredText(body.role, "Role", 20);
+    const message = optionalText(body.message, "Message", 1000);
     const actor = await getAdminSession();
     if (!actor) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!EMAIL_PATTERN.test(email)) throw new ApiInputError("Enter a valid email address.");
@@ -101,7 +103,7 @@ export async function POST(request: Request) {
         select: { id: true, email: true, username: true, name: true, role: true, isActive: true, createdAt: true },
       });
     try {
-      await sendAdminPasswordEmail(email, token, "invite");
+      await sendAdminPasswordEmail(email, token, "invite", message);
     } catch (error) {
       if (!existing) await prisma.adminUser.delete({ where: { id: user.id } });
       throw error;

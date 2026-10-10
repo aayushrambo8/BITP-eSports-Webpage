@@ -197,11 +197,6 @@ export default function ContactPage() {
 
             </div>
           </div>
-
-          <div className="border-t border-[#33343b] pt-6 font-label-mono-sm text-xs text-[#8f96a3]">
-            <span>STATUS: </span>
-            <span className="text-[#00e599]">MESSAGE INBOX ACTIVE // EMAIL NOTIFICATIONS OPTIONAL</span>
-          </div>
         </aside>
 
         {/* RIGHT COLUMN: Contact Form with Mail Delivery Pipeline */}
@@ -225,7 +220,7 @@ export default function ContactPage() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Alex Chen // 'Viper'"
+                  placeholder=""
                   className="w-full bg-[#191b22] border border-[#33343b] px-4 py-3 text-white font-body-md focus:border-[#cdf200] outline-none transition-colors"
                 />
               </div>
@@ -240,7 +235,7 @@ export default function ContactPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="e.g. student@university.edu"
+                  placeholder="e.g. name@example.com"
                   className="w-full bg-[#191b22] border border-[#33343b] px-4 py-3 text-white font-body-md focus:border-[#cdf200] outline-none transition-colors"
                 />
               </div>
@@ -309,9 +304,6 @@ export default function ContactPage() {
                   <Send className="w-4 h-4" />
                   <span>{isSubmitting ? 'SENDING MESSAGE...' : 'SEND MESSAGE'}</span>
                 </button>
-                <span className="font-label-mono-sm text-[#8f96a3] text-xs">
-                  STORED VIA /api/contact ADMIN INBOX
-                </span>
               </div>
 
               {/* Delivery Confirmation Banner */}

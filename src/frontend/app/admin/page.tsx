@@ -209,7 +209,7 @@ export default function AdminPage() {
   const [error, setError] = useState('');
   const [role, setRole] = useState<AdminUser['role'] | null>(null);
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [newUser, setNewUser] = useState({ email: '', role: 'MODERATOR' as AdminUser['role'] });
+  const [newUser, setNewUser] = useState({ email: '', role: 'MODERATOR' as AdminUser['role'], message: '' });
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [profile, setProfile] = useState<AdminProfile | null>(null);
@@ -383,7 +383,7 @@ export default function AdminPage() {
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || 'Could not invite this user.');
-      setNewUser({ email: '', role: 'MODERATOR' });
+      setNewUser({ email: '', role: 'MODERATOR', message: '' });
       setNotice('Invitation sent. The account holder must set a password within 30 minutes.');
       await loadUsers();
     } catch (inviteError) {
@@ -761,6 +761,7 @@ export default function AdminPage() {
               {role === 'OWNER' ? (
                 <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Privilege<select value={newUser.role} onChange={(event) => setNewUser({ ...newUser, role: event.target.value as AdminUser['role'] })} className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 text-white"><option value="MODERATOR">Moderator</option><option value="ADMIN">Admin</option><option value="OWNER">Owner</option></select></label>
               ) : <p className="text-sm text-[#8f96a3]">New accounts are created as <span className="font-bold text-[#cdf200]">Moderator</span>.</p>}
+              <label className="block space-y-1 text-xs uppercase text-[#8f96a3]">Personal message (optional)<textarea value={newUser.message} onChange={(event) => setNewUser({ ...newUser, message: event.target.value })} rows={3} maxLength={1000} placeholder="e.g. Welcome to the team! Please set your password within 30 minutes." className="w-full border border-[#33343b] bg-[#191b22] px-3 py-2 normal-case text-white" /><span className="block normal-case">Included in the invitation email.</span></label>
               <button disabled={busy} className="bg-[#cdf200] px-4 py-2 font-label-caps text-xs font-bold uppercase text-[#0a0b0e] disabled:opacity-50">Send invitation</button>
             </form>
           </section>
