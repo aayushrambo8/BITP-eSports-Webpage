@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#101729"/><stop offset=".57" stop-color="#25203a"/><stop offset="1" stop-color="#101117"/></linearGradient>
+    <linearGradient id="rain" x2="0" y2="1"><stop stop-color="#19efff" stop-opacity="0"/><stop offset=".48" stop-color="#19efff" stop-opacity=".48"/><stop offset="1" stop-color="#ff294d" stop-opacity="0"/></linearGradient>
+    <linearGradient id="sun" x2="0" y2="1"><stop stop-color="#ff3d69"/><stop offset="1" stop-color="#ff8848" stop-opacity=".12"/></linearGradient>
+    <pattern id="windows" width="34" height="42" patternUnits="userSpaceOnUse"><path d="M7 8h13v19H7z" fill="#18d8f2" fill-opacity=".48"/><path d="M25 8h3v19h-3z" fill="#ff4167" fill-opacity=".55"/></pattern>
+    <filter id="glow"><feGaussianBlur stdDeviation="14"/></filter>
+  </defs>
+  <path fill="url(#sky)" d="M0 0h1440v900H0z"/>
+  <circle cx="1028" cy="302" r="148" fill="#ff285d" opacity=".34" filter="url(#glow)"/>
+  <circle cx="1028" cy="302" r="116" fill="url(#sun)" opacity=".9"/>
+  <path d="M0 520 92 412l35 22 45-90 68 26 61-104 48 21 38-84 57 21 39-71 65 42 48-66 44 52 73-71 65 44 46-92 52 34 48-55 72 45 49-36 61 54 62-24 50 61 49-17 69 68 48-35 58 59 59-3 49 60 76-27v442H0z" fill="#171827"/>
+  <path d="m0 586 81-66 49 24 75-92 63 39 55-133 59 33 49-108 55 26 56-83 59 59 39-76 63 53 58-96 50 52 67-66 69 48 58-77 56 35 62-43 80 67 79-29 70 88 49-14 60 82 73-24v435H0z" fill="#202236"/>
+  <path d="M0 586h1440v314H0z" fill="#111219"/>
+  <path d="M80 545V342h114v203m-90-192h68v190H104zm174 192V262h145v283m-118-261h91v261h-91zm190 261V188h125v357m-100-338h76v338h-76zm190 0V292h98v253m-77-235h56v235h-56zm141 0V222h138v323m-109-302h81v302h-81zm180 0V314h119v231m-94-212h70v212h-70zm162 0V259h145v286m-116-267h86v267h-86z" fill="url(#windows)" opacity=".7"/>
+  <path d="M0 676h1440" stroke="#fa315c" stroke-opacity=".68"/>
+  <path d="M0 697h1440M0 737h1440M0 787h1440" stroke="#1deaff" stroke-opacity=".12"/>
+  <path d="M167 900 694 648h122L467 900zm590 0 317-252h64l-186 252zm-690-17h121l350-235h-64z" fill="#fc315d" fill-opacity=".12"/>
+  <path d="M944 900 811 648h49l210 252zm204 0-93-252h34l168 252z" fill="#17e8ff" fill-opacity=".14"/>
+  <path d="M0 0h1440v900H0z" fill="url(#rain)" opacity=".2"/>
+  <g stroke="#51edff" stroke-opacity=".4"><path d="m223 57-62 219m419-196-39 144m822-147-76 284M557 342l-70 261m768-371-92 334M72 332 21 510"/></g>
+  <text x="72" y="802" fill="#f2f2fa" fill-opacity=".65" font-family="monospace" font-size="19" letter-spacing="8">XORDIUM // NEON CITY 05</text>
+</svg>
