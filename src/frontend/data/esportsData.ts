@@ -1,17 +1,8 @@
-<<<<<<< HEAD
-export interface FestivalGame {
-=======
 export interface ClubGame {
->>>>>>> origin/main
   id: string;
   name: string;
   tag: string;
   divisionBadge: string;
-<<<<<<< HEAD
-  category: string;
-  description: string;
-  league: string;
-=======
   category: 'CONSOLE' | 'PC' | 'MOBILE';
   description: string;
   captain: string;
@@ -55,7 +46,6 @@ export interface RecentResult {
   team2: string;
   score2: number | string;
   subtext: string;
->>>>>>> origin/main
 }
 
 export interface TournamentEvent {
@@ -82,16 +72,6 @@ export function formatEventTime(event: { timeStr: string; endTimeStr?: string | 
   return `${event.timeStr} - ${event.endTimeStr}`;
 }
 
-<<<<<<< HEAD
-export function parseTimeString(timeStr: string): { hours: number; minutes: number } | null {
-  if (!timeStr) return null;
-  const cleaned = timeStr.trim();
-  const match24 = cleaned.match(/^(\d{1,2}):(\d{2})$/);
-  if (match24) {
-    return { hours: parseInt(match24[1], 10), minutes: parseInt(match24[2], 10) };
-  }
-  const match12 = cleaned.match(/^(\d{1,2})(?::(\d{2}))?\s*(AM|PM)$/i);
-=======
 // Helper to parse time strings (e.g., "3:30 PM" or "15:30")
 export function parseTimeString(timeStr: string): { hours: number; minutes: number } | null {
   if (!timeStr) return null;
@@ -101,7 +81,6 @@ export function parseTimeString(timeStr: string): { hours: number; minutes: numb
     return { hours: parseInt(match24[1], 10), minutes: parseInt(match24[2], 10) };
   }
   const match12 = cleaned.match(/^(\\d{1,2})(?::(\\d{2}))?\\s*(AM|PM)$/i);
->>>>>>> origin/main
   if (match12) {
     let hours = parseInt(match12[1], 10);
     const minutes = match12[2] ? parseInt(match12[2], 10) : 0;
@@ -113,55 +92,11 @@ export function parseTimeString(timeStr: string): { hours: number; minutes: numb
   return null;
 }
 
-<<<<<<< HEAD
-=======
 // Determines if an event has already ended in IST timezone
->>>>>>> origin/main
 export function isEventEndedIST(event: TournamentEvent, now: Date = new Date()): boolean {
   if (event.statusBadge?.toUpperCase() === 'COMPLETED' || event.statusBadge?.toUpperCase() === 'ARCHIVED') {
     return true;
   }
-<<<<<<< HEAD
-  const startDate = new Date(event.isoDate);
-  if (Number.isNaN(startDate.getTime())) return false;
-
-  const formatISTDate = (date: Date) => new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Kolkata',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(date);
-  const pad = (value: number) => value.toString().padStart(2, '0');
-  const toISTDate = (date: Date, hours: number, minutes: number) =>
-    new Date(`${formatISTDate(date)}T${pad(hours)}:${pad(minutes)}:00+05:30`);
-
-  if (event.endTimeStr) {
-    const endTime = parseTimeString(event.endTimeStr);
-    if (endTime) {
-      const endDate = toISTDate(startDate, endTime.hours, endTime.minutes);
-      const startTime = parseTimeString(event.timeStr);
-      if (
-        startTime &&
-        (endTime.hours < startTime.hours ||
-          (endTime.hours === startTime.hours && endTime.minutes < startTime.minutes))
-      ) {
-        endDate.setDate(endDate.getDate() + 1);
-      }
-      if (!Number.isNaN(endDate.getTime())) return endDate.getTime() <= now.getTime();
-    }
-  }
-
-  const startTime = parseTimeString(event.timeStr);
-  if (startTime) {
-    const endHour = (startTime.hours + 2) % 24;
-    const endDate = toISTDate(startDate, endHour, startTime.minutes);
-    if (startTime.hours + 2 >= 24) endDate.setDate(endDate.getDate() + 1);
-    if (!Number.isNaN(endDate.getTime())) return endDate.getTime() <= now.getTime();
-  }
-
-  return startDate.getTime() <= now.getTime();
-}
-=======
   const nowMs = now.getTime();
   const startDate = new Date(event.isoDate);
   if (isNaN(startDate.getTime())) return false;
@@ -452,4 +387,3 @@ export const FAQS = [
     answer: 'Yes! Reach out via our Contact form with your game title and student interest. If there is active campus demand, our officers can charter a recognized division.',
   },
 ];
->>>>>>> origin/main
